@@ -1,0 +1,85 @@
+/* ============================================================
+   variables.css — Design tokens
+   ============================================================ */
+
+:root {
+    /* Core palette — deep space blues */
+    --space-900: #030816;
+    --space-800: #050c24;
+    --space-700: #0a1a3f;
+    --space-600: #0f2657;
+    --space-500: #17408b;
+
+    /* Accents — temporal glow */
+    --glow-cyan: #4fd6ff;
+    --glow-blue: #2b8bff;
+    --glow-purple: #8a6bff;
+    --glow-gold: #ffd166;
+
+    /* Text */
+    --text-primary: #eaf2ff;
+    --text-muted: #9fb3d8;
+    --text-dim: #6a80a8;
+
+    /* Surfaces */
+    --surface: rgba(15, 38, 87, 0.35);
+    --surface-strong: rgba(15, 38, 87, 0.6);
+    --border: rgba(79, 214, 255, 0.18);
+    --border-strong: rgba(79, 214, 255, 0.45);
+
+    /* Status colors */
+    --status-active: #4fd6ff;
+    --status-finished: #57e39b;
+    --status-archived: #b08cff;
+
+    /* Typography */
+    --font-sans: "Segoe UI", "Helvetica Neue", system-ui, -apple-system, sans-serif;
+    --font-display: "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
+
+    /* Spacing scale */
+    --sp-1: 0.25rem;
+    --sp-2: 0.5rem;
+    --sp-3: 0.75rem;
+    --sp-4: 1rem;
+    --sp-6: 1.5rem;
+    --sp-8: 2rem;
+    --sp-12: 3rem;
+    --sp-16: 4rem;
+
+    /* Radii & shadows */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 22px;
+    --shadow-glow: 0 0 30px rgba(79, 214, 255, 0.25);
+    --shadow-card: 0 12px 40px rgba(3, 8, 22, 0.55);
+
+    /* Motion */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur-fast: 180ms;
+    --dur-med: 340ms;
+    --dur-slow: 620ms;
+
+    /* Layout */
+    --content-max: 1200px;
+    --header-h: 72px;
+}
+
+/* Light theme override */
+:root[data-theme="light"] {
+    --space-900: #dbe7ff;
+    --space-800: #cdddff;
+    --space-700: #bcd0fb;
+    --space-600: #a9c2f4;
+    --space-500: #7ea3e6;
+
+    --text-primary: #0a1a3f;
+    --text-muted: #274170;
+    --text-dim: #4a628f;
+
+    --surface: rgba(255, 255, 255, 0.55);
+    --surface-strong: rgba(255, 255, 255, 0.78);
+    --border: rgba(23, 64, 139, 0.18);
+    --border-strong: rgba(23, 64, 139, 0.4);
+
+    --shadow-card: 0 12px 40px rgba(23, 64, 139, 0.18);
+}

@@ -1,0 +1,302 @@
+/* ============================================================
+   components.css — Brand, nav, controls, filters, project cards
+   ============================================================ */
+
+/* ---------- Brand ---------- */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-weight: 600;
+    font-size: 1.15rem;
+}
+
+.brand__mark {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    display: inline-grid;
+    place-items: center;
+}
+
+.brand__ring {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--glow-cyan);
+    border-radius: 50%;
+    opacity: 0.7;
+}
+
+.brand__core {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--glow-blue));
+    box-shadow: var(--shadow-glow);
+}
+
+.brand__dot {
+    color: var(--glow-cyan);
+}
+
+/* ---------- Nav links ---------- */
+.main-nav__link {
+    position: relative;
+    color: var(--text-muted);
+    padding: var(--sp-1) 0;
+    transition: color var(--dur-fast) var(--ease);
+}
+
+.main-nav__link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--glow-cyan), var(--glow-purple));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-med) var(--ease);
+}
+
+.main-nav__link:hover,
+.main-nav__link:focus-visible {
+    color: var(--text-primary);
+}
+
+.main-nav__link:hover::after,
+.main-nav__link:focus-visible::after {
+    transform: scaleX(1);
+}
+
+/* ---------- Controls ---------- */
+.control {
+    display: inline-flex;
+    align-items: center;
+    height: 38px;
+    padding: 0 var(--sp-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease),
+                color var(--dur-fast) var(--ease),
+                background var(--dur-fast) var(--ease);
+}
+
+.control:hover,
+.control:focus-within {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+.control--select select {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.control--select select option {
+    background: var(--space-700);
+    color: var(--text-primary);
+}
+
+.control--btn[aria-pressed="true"] {
+    border-color: var(--border-strong);
+    color: var(--glow-cyan);
+    background: var(--surface-strong);
+}
+
+/* ---------- Filters ---------- */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-8);
+}
+
+.filter {
+    padding: var(--sp-2) var(--sp-4);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease);
+}
+
+.filter:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+}
+
+.filter.is-active {
+    color: var(--space-900);
+    background: linear-gradient(120deg, var(--glow-cyan), var(--glow-blue));
+    border-color: transparent;
+    box-shadow: var(--shadow-glow);
+    font-weight: 600;
+}
+
+:root[data-theme="light"] .filter.is-active {
+    color: #fff;
+}
+
+/* ---------- Project cards ---------- */
+.project-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    padding: var(--sp-6);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    transition: transform var(--dur-med) var(--ease),
+                border-color var(--dur-med) var(--ease),
+                box-shadow var(--dur-med) var(--ease);
+}
+
+.project-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 0%),
+                rgba(79, 214, 255, 0.14), transparent 45%);
+    opacity: 0;
+    transition: opacity var(--dur-med) var(--ease);
+    pointer-events: none;
+}
+
+.project-card:hover,
+.project-card:focus-within {
+    transform: translateY(-6px);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+
+.project-card:hover::before,
+.project-card:focus-within::before {
+    opacity: 1;
+}
+
+.project-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sp-3);
+}
+
+.project-card__title {
+    font-size: 1.2rem;
+}
+
+.project-card__desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    flex: 1;
+}
+
+/* Status badge */
+.badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    padding: var(--sp-1) var(--sp-2);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+}
+
+.badge::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.badge--active { color: var(--status-active); }
+.badge--finished { color: var(--status-finished); }
+.badge--archived { color: var(--status-archived); }
+
+/* Progress bar */
+.progress {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.progress__bar {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--glow-cyan), var(--glow-purple));
+    width: 0;
+    transition: width var(--dur-slow) var(--ease);
+}
+
+/* Card footer / link */
+.project-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: var(--sp-2);
+}
+
+.project-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-weight: 600;
+    color: var(--glow-cyan);
+}
+
+.project-card__link[aria-disabled="true"] {
+    color: var(--text-dim);
+    pointer-events: none;
+}
+
+.project-card__link .arrow {
+    transition: transform var(--dur-fast) var(--ease);
+}
+
+.project-card__link:hover .arrow {
+    transform: translateX(4px);
+}
+
+[dir="rtl"] .project-card__link:hover .arrow {
+    transform: translateX(-4px) scaleX(-1);
+}
+
+.project-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+}
+
+.tag {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    padding: 2px var(--sp-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+/* Empty state */
+.project-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-dim);
+    padding: var(--sp-12);
+}

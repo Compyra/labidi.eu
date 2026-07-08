@@ -1,0 +1,81 @@
+/* ============================================================
+   responsive.css — Breakpoints & adaptive layout
+   ============================================================ */
+
+/* Tablet and below */
+@media (max-width: 860px) {
+    .site-header {
+        flex-wrap: wrap;
+        gap: var(--sp-3);
+    }
+
+    .main-nav {
+        order: 3;
+        width: 100%;
+        margin-inline-start: 0;
+    }
+
+    .main-nav__list {
+        justify-content: center;
+        gap: var(--sp-4);
+    }
+
+    .header-controls {
+        margin-inline-start: auto;
+    }
+}
+
+/* Mobile */
+@media (max-width: 560px) {
+    .project-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .main-nav__list {
+        gap: var(--sp-3);
+        font-size: 0.9rem;
+    }
+
+    .header-controls {
+        flex-wrap: wrap;
+    }
+
+    .welcome {
+        padding-top: var(--sp-8);
+    }
+}
+
+/* Large desktops */
+@media (min-width: 1600px) {
+    :root {
+        --content-max: 1360px;
+    }
+}
+
+/* Ensure touch targets stay >= 44px on coarse pointers */
+@media (pointer: coarse) {
+    .control,
+    .filter,
+    .main-nav__link {
+        min-height: 44px;
+    }
+
+    .main-nav__link {
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
+/* Honour print */
+@media print {
+    #space-canvas,
+    .header-controls,
+    .filters {
+        display: none;
+    }
+
+    body {
+        background: #fff;
+        color: #000;
+    }
+}

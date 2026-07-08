@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="labidi.eu — a futuristic portal for projects, navigation and temporal exploration.">
+    <meta name="theme-color" content="#0a1a3f">
+    <meta name="color-scheme" content="dark light">
+    <title>labidi.eu // Temporal Portal</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%B8%3C/text%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Background canvas: space particles + planets -->
+    <canvas id="space-canvas" aria-hidden="true"></canvas>
+
+    <!-- Skip link for accessibility -->
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="site-header" role="banner">
+        <div class="brand">
+            <span class="brand__mark" aria-hidden="true">
+                <span class="brand__ring"></span>
+                <span class="brand__core"></span>
+            </span>
+            <span class="brand__name">labidi<span class="brand__dot">.</span>eu</span>
+        </div>
+
+        <nav class="main-nav" aria-label="Primary">
+            <ul class="main-nav__list">
+                <li><a class="main-nav__link" href="#projects" data-i18n="nav.projects">Projects</a></li>
+                <li><a class="main-nav__link" href="#about" data-i18n="nav.about">About</a></li>
+                <li><a class="main-nav__link" href="#contact" data-i18n="nav.contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-controls">
+            <label class="control control--select" for="lang-select">
+                <span class="sr-only" data-i18n="controls.language">Language</span>
+                <select id="lang-select" aria-label="Language">
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                    <option value="de">DE</option>
+                    <option value="ar">AR</option>
+                </select>
+            </label>
+
+            <button id="motion-toggle" class="control control--btn" type="button" aria-pressed="false">
+                <span data-i18n="controls.motion">Motion</span>
+            </button>
+
+            <button id="theme-toggle" class="control control--btn" type="button" aria-pressed="false">
+                <span data-i18n="controls.theme">Theme</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===================== MAIN ===================== -->
+    <main id="main" class="site-main">
+
+        <!-- Welcome banner -->
+        <section class="welcome" aria-labelledby="welcome-title">
+            <p class="welcome__eyebrow" data-i18n="welcome.eyebrow">Incoming transmission</p>
+            <h1 id="welcome-title" class="welcome__title">
+                <span data-i18n="welcome.greeting">Welcome, visitor</span>
+            </h1>
+            <p class="welcome__subtitle" data-i18n="welcome.subtitle">
+                You have arrived at a fixed point in space and time.
+            </p>
+            <p class="welcome__clock" id="clock" aria-live="polite"></p>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects" class="projects" aria-labelledby="projects-title">
+            <div class="section-head">
+                <h2 id="projects-title" class="section-head__title" data-i18n="projects.title">Projects</h2>
+                <p class="section-head__lead" data-i18n="projects.lead">
+                    A catalogue of ongoing experiments, completed builds and archived timelines.
+                </p>
+            </div>
+
+            <div class="filters" role="group" aria-label="Filter projects">
+                <button class="filter is-active" type="button" data-filter="all" data-i18n="filters.all">All</button>
+                <button class="filter" type="button" data-filter="active" data-i18n="filters.active">Active</button>
+                <button class="filter" type="button" data-filter="finished" data-i18n="filters.finished">Finished</button>
+                <button class="filter" type="button" data-filter="archived" data-i18n="filters.archived">Archived</button>
+            </div>
+
+            <ul id="project-grid" class="project-grid"></ul>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="about" aria-labelledby="about-title">
+            <div class="section-head">
+                <h2 id="about-title" class="section-head__title" data-i18n="about.title">About this portal</h2>
+            </div>
+            <p class="about__text" data-i18n="about.text">
+                A centralized hub for navigation, project management and visitor information —
+                built with pure HTML, CSS and JavaScript. No frameworks, no dependencies, no tracking.
+            </p>
+        </section>
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer id="contact" class="site-footer" role="contentinfo">
+        <p class="site-footer__message" data-i18n="footer.message">
+            Safe travels through the vortex.
+        </p>
+        <p class="site-footer__meta">
+            <span id="footer-year"></span> &middot; labidi.eu
+        </p>
+    </footer>
+
+    <!-- Scripts: order matters (data + i18n before main) -->
+    <script src="js/i18n.js" defer></script>
+    <script src="js/projects.js" defer></script>
+    <script src="js/particles.js" defer></script>
+    <script src="js/main.js" defer></script>
+</body>
+</html>

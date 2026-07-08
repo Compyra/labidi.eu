@@ -1,0 +1,68 @@
+/* ============================================================
+   animations.css — Keyframes, entrance transitions, motion prefs
+   ============================================================ */
+
+@keyframes float-in {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse-ring {
+    0%   { transform: scale(1);   opacity: 0.7; }
+    50%  { transform: scale(1.18); opacity: 0.25; }
+    100% { transform: scale(1);   opacity: 0.7; }
+}
+
+@keyframes spin-slow {
+    to { transform: rotate(360deg); }
+}
+
+/* Brand ring pulse */
+.brand__ring {
+    animation: pulse-ring 4s var(--ease) infinite;
+}
+
+/* Staggered card entrance */
+.project-card {
+    animation: float-in var(--dur-slow) var(--ease) both;
+}
+
+.welcome__eyebrow,
+.welcome__title,
+.welcome__subtitle,
+.welcome__clock {
+    animation: float-in var(--dur-slow) var(--ease) both;
+}
+
+.welcome__title { animation-delay: 90ms; }
+.welcome__subtitle { animation-delay: 180ms; }
+.welcome__clock { animation-delay: 270ms; }
+
+/* Reduced-motion: disable all non-essential animation.
+   Toggled either by OS preference or the in-page Motion button
+   (which sets data-motion="off" on <html>). */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+:root[data-motion="off"] *,
+:root[data-motion="off"] *::before,
+:root[data-motion="off"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
