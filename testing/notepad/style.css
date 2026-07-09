@@ -155,7 +155,7 @@ kbd {
   cursor: pointer; font-size: 12px; padding: 0 2px;
 }
 .filetree .node:hover .del { opacity: 1; }
-.filetree .children { list-style: none; margin: 0; padding-left: 14px; }
+.filetree .children { list-style: none; margin: 0; padding-left: 0; }
 
 /* ===== Editor area ===== */
 .editor-area { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; position: relative; }
@@ -261,12 +261,16 @@ kbd {
 
 /* ===== Status bar ===== */
 .statusbar {
-  height: 24px; flex: 0 0 auto; display: flex; align-items: center;
-  justify-content: space-between; background: var(--accent); color: #fff;
-  font-size: 12px; padding: 0 4px; user-select: none;
+  height: 24px; flex: 0 0 auto; display: flex; align-items: stretch;
+  background: var(--accent); color: #fff;
+  font-size: 12px; user-select: none;
 }
-.statusbar__left, .statusbar__right { display: flex; }
-.st-item { padding: 0 8px; cursor: default; display: inline-flex; align-items: center; height: 24px; }
+.statusbar__pane { flex: 1; display: flex; align-items: center; justify-content: space-between; min-width: 0; padding: 0 4px; overflow: hidden; }
+.statusbar__pane--secondary { border-left: 1px solid rgba(255,255,255,.35); }
+/* dim the inactive pane so the focused editor is obvious */
+.statusbar__pane:not(.active) { background: rgba(0,0,0,.18); }
+.statusbar__left, .statusbar__right { display: flex; min-width: 0; }
+.st-item { padding: 0 8px; cursor: default; display: inline-flex; align-items: center; height: 24px; white-space: nowrap; }
 .st-item:hover { background: rgba(255,255,255,.15); }
 [data-clickable] { cursor: pointer; }
 
@@ -466,10 +470,50 @@ kbd {
 
 /* ===== Explorer folders + drag-and-drop ===== */
 .node--folder .nm { font-weight: 600; }
-.filetree .empty-folder { padding: 2px 10px 2px 30px; color: var(--fg-faint); font-size: 11px; font-style: italic; }
+.node .chevron { width: 14px; text-align: center; font-size: 10px; color: var(--fg-dim); flex: 0 0 auto; user-select: none; }
+.filetree .empty-folder { color: var(--fg-faint); font-size: 11px; font-style: italic; }
 .filetree .children--root { min-height: 24px; }
 .root-drop { display: block; }
+/* indent guide for nested folder contents */
+.filetree .tree-item > .children { position: relative; }
+.filetree .tree-item > .children::before {
+  content: ""; position: absolute; left: 22px; top: 0; bottom: 0; border-left: 1px solid var(--border);
+}
 [data-droptarget].over { background: rgba(0,122,204,.16); outline: 1px dashed var(--accent); outline-offset: -1px; border-radius: 3px; }
 .filetree .node[draggable="true"] { cursor: grab; }
 .filetree .node[draggable="true"]:active { cursor: grabbing; }
+.filetree .node--insplit { box-shadow: inset 2px 0 0 var(--ok); }
+
+/* ===== Context menu (Explorer + tabs) ===== */
+.ctxmenu {
+  position: fixed; z-index: 300; min-width: 190px; padding: 4px;
+  background: var(--bg-elev); border: 1px solid var(--border-strong); border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.5); font-size: 13px;
+}
+.ctxmenu__item {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--fg); white-space: nowrap;
+}
+.ctxmenu__item:hover, .ctxmenu__item.sel { background: var(--accent); color: #fff; }
+.ctxmenu__item.disabled { color: var(--fg-faint); pointer-events: none; }
+.ctxmenu__kb { color: var(--fg-dim); font-size: 11px; }
+.ctxmenu__item.sel .ctxmenu__kb { color: rgba(255,255,255,.8); }
+.ctxmenu__sep { height: 1px; background: var(--border); margin: 4px 2px; }
+
+/* ===== Table view: filters + row count ===== */
+.table-toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 5px 10px; border-bottom: 1px solid var(--border); background: var(--bg-alt); flex: 0 0 auto;
+}
+.table-count { font-size: 12px; color: var(--fg-dim); }
+.table-toolbar .text-btn { padding: 2px 8px; font-size: 12px; }
+.data-table tr.filter-row th { position: sticky; top: 22px; background: var(--bg-elev); padding: 2px; z-index: 2; }
+.data-table tr.filter-row th.rownum { top: 22px; z-index: 3; }
+.data-table .col-filter {
+  width: 100%; min-width: 60px; box-sizing: border-box; background: var(--bg-input);
+  border: 1px solid var(--border-strong); color: var(--fg); border-radius: 3px;
+  padding: 2px 5px; font-size: 11px; font-family: var(--font-ui); outline: none;
+}
+.data-table .col-filter:focus { border-color: var(--accent); }
+
 

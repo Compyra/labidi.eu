@@ -677,6 +677,148 @@
   const secEd = { input: null, highlight: null, gutter: null, scroll: null };
 
   /* ---------------------------------------------------------
+     Pane abstraction (todo3: shortcuts route to the focused pane)
+     Both the primary and the secondary "Second File" editor share
+     the same behaviour through a lightweight editor object.
+     --------------------------------------------------------- */
+  const primaryEd = {
+    isPrimary: true,
+    get input() { return dom.input; },
+    get highlight() { return dom.highlight; },
+    get gutter() { return dom.gutter; },
+    get scroll() { return dom.codeScroll; },
+    getTab: () => activeTab(),
+  };
+  secEd.isPrimary = false;
+  secEd.getTab = () => tabById(state.secondary.tabId);
+  state.focused = "primary"; // which pane last had editor focus
+
+  function secondaryIsEditor() {
+    return state.secondary.open && state.secondary.mode === "editor" && secEd.input && document.contains(secEd.input);
+  }
+  // The editor that keyboard actions should apply to.
+  function activeEd() {
+    return (state.focused === "secondary" && secondaryIsEditor()) ? secEd : primaryEd;
+  }
+  function edTab(ed) { return ed.getTab(); }
+
+  /* ---------------------------------------------------------
+     Undo / redo — a small per-tab history stack. We manage this
+     ourselves (rather than relying on the textarea's native stack)
+     because programmatic edits (indent, duplicate line, replace…)
+     otherwise break native undo, and so redo can be bound to Ctrl+Y.
+     --------------------------------------------------------- */
+  const UndoMgr = (function () {
+    const map = new WeakMap();
+    function st(tab) {
+      if (!map.has(tab)) map.set(tab, { stack: [{ value: tab.content, s: tab.cursor || 0, e: tab.cursor || 0 }], idx: 0, timer: null });
+      return map.get(tab);
+    }
+    function seed(tab) { st(tab); }
+    function snapshot(tab, ed) {
+      const s = st(tab);
+      const val = ed ? ed.input.value : tab.content;
+      if (s.stack[s.idx] && s.stack[s.idx].value === val) return;
+      s.stack.length = s.idx + 1; // drop any redo history
+      s.stack.push({ value: val, s: ed ? ed.input.selectionStart : val.length, e: ed ? ed.input.selectionEnd : val.length });
+      s.idx = s.stack.length - 1;
+      if (s.stack.length > 250) { s.stack.shift(); s.idx--; }
+    }
+    function record(tab, ed) { const s = st(tab); clearTimeout(s.timer); s.timer = setTimeout(() => snapshot(tab, ed), 300); }
+    function apply(tab, ed, snap) {
+      ed.input.value = snap.value; tab.content = snap.value; tab.dirty = true;
+      try { ed.input.setSelectionRange(snap.s, snap.e); } catch (e) {}
+      renderHighlightFor(ed); renderTabs(); renderTree(); renderStatus(); persist();
+      if (ed.isPrimary && state.secondary.open && state.secondary.mode !== "editor") scheduleSecondary();
+    }
+    function undo(tab, ed) { const s = st(tab); clearTimeout(s.timer); snapshot(tab, ed); if (s.idx > 0) { s.idx--; apply(tab, ed, s.stack[s.idx]); } }
+    function redo(tab, ed) { const s = st(tab); clearTimeout(s.timer); if (s.idx < s.stack.length - 1) { s.idx++; apply(tab, ed, s.stack[s.idx]); } }
+    return { seed, record, undo, redo };
+  })();
+
+  // Stack of recently closed tabs, for "reopen last closed" (Ctrl+Shift+T).
+  const closedStack = [];
+  function pushClosed(t, pane) {
+    closedStack.push({ name: t.name, content: t.content, lang: t.lang, folder: t.folder, cursor: t.cursor || 0, pane: pane || "primary" });
+    if (closedStack.length > 30) closedStack.shift();
+  }
+  function reopenLastClosed() {
+    const c = closedStack.pop();
+    if (!c) { toast("No recently closed files", "err"); return; }
+    const t = newFile(c.name, c.content, c.folder);
+    t.cursor = c.cursor;
+    if (c.pane === "secondary" && state.tabs.length > 1) openSecondary("editor", t.id);
+    toast("Reopened " + c.name, "ok");
+  }
+
+  /* ---------------------------------------------------------
+     Reusable context menu (todo3 items 2 & 3)
+     --------------------------------------------------------- */
+  const ContextMenu = (function () {
+    let el = null, items = [], idx = -1, onScrollClose = null;
+
+    function close() {
+      if (!el) return;
+      el.remove(); el = null; items = []; idx = -1;
+      document.removeEventListener("mousedown", outside, true);
+      document.removeEventListener("keydown", onKey, true);
+      window.removeEventListener("scroll", closeScroll, true);
+      window.removeEventListener("resize", close, true);
+    }
+    function outside(e) { if (el && !el.contains(e.target)) close(); }
+    function closeScroll() { close(); }
+    function move(d) {
+      const n = items.length; if (!n) return;
+      let i = idx;
+      do { i = (i + d + n) % n; } while (items[i].separator && i !== idx);
+      idx = i; highlight();
+    }
+    function highlight() {
+      $$(".ctxmenu__item", el).forEach((it, i) => it.classList.toggle("sel", i === idx));
+      const sel = el.querySelector(".ctxmenu__item.sel");
+      if (sel) sel.scrollIntoView({ block: "nearest" });
+    }
+    function onKey(e) {
+      if (!el) return;
+      if (e.key === "Escape") { e.preventDefault(); close(); }
+      else if (e.key === "ArrowDown") { e.preventDefault(); move(1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); move(-1); }
+      else if (e.key === "Enter") { e.preventDefault(); if (items[idx] && items[idx].action) { const a = items[idx].action; close(); a(); } }
+    }
+    function open(x, y, list) {
+      close();
+      items = list.filter(Boolean);
+      el = document.createElement("div");
+      el.className = "ctxmenu";
+      el.setAttribute("role", "menu");
+      items.forEach((it, i) => {
+        if (it.separator) { const s = document.createElement("div"); s.className = "ctxmenu__sep"; el.appendChild(s); return; }
+        const d = document.createElement("div");
+        d.className = "ctxmenu__item" + (it.disabled ? " disabled" : "");
+        d.setAttribute("role", "menuitem");
+        d.dataset.i = i;
+        d.innerHTML = "<span>" + escapeHtml(it.label) + "</span>" + (it.kb ? '<span class="ctxmenu__kb">' + escapeHtml(it.kb) + "</span>" : "");
+        if (!it.disabled) d.addEventListener("click", () => { const a = it.action; close(); a && a(); });
+        el.appendChild(d);
+      });
+      document.body.appendChild(el);
+      // keep within viewport
+      const r = el.getBoundingClientRect();
+      const vw = window.innerWidth, vh = window.innerHeight;
+      if (x + r.width > vw) x = Math.max(4, vw - r.width - 4);
+      if (y + r.height > vh) y = Math.max(4, vh - r.height - 4);
+      el.style.left = x + "px"; el.style.top = y + "px";
+      setTimeout(() => {
+        document.addEventListener("mousedown", outside, true);
+        document.addEventListener("keydown", onKey, true);
+        window.addEventListener("scroll", closeScroll, true);
+        window.addEventListener("resize", close, true);
+      }, 0);
+    }
+    return { open, close };
+  })();
+
+  /* ---------------------------------------------------------
      Rendering
      --------------------------------------------------------- */
   const scheduleHighlight = debounce(renderHighlight, 40);
@@ -702,6 +844,7 @@
     dom.empty.classList.add("hidden");
     dom.code.classList.remove("hidden");
     if (dom.input.value !== t.content) dom.input.value = t.content;
+    UndoMgr.seed(t);
     renderHighlight();
     // restore scroll/cursor
     requestAnimationFrame(() => {
@@ -713,35 +856,43 @@
     });
   }
 
-  function renderHighlight() {
-    const t = activeTab();
-    if (!t) return;
-    const src = dom.input.value;
+  function renderHighlight() { renderHighlightFor(primaryEd); }
+
+  function renderHighlightFor(ed) {
+    const t = edTab(ed);
+    if (!t || !ed.input) return;
+    const src = ed.input.value;
     let html = Highlight.run(src, t.lang);
-    // find highlights overlay
-    if (state.find.open && state.find.hits.length) html = injectFindMarks(html, src);
+    // find highlights overlay (only in the pane the find widget targets)
+    if (state.find.open && findEd === ed && state.find.hits.length) html = injectFindMarks(html, src);
     // trailing newline keeps last line height correct
-    dom.highlight.innerHTML = html + "\n";
-    renderGutter(src);
+    ed.highlight.innerHTML = html + "\n";
+    renderGutterFor(ed);
   }
 
-  function renderGutter(src) {
-    const t = activeTab();
+  function renderGutter(src) { renderGutterFor(primaryEd); }
+
+  function renderGutterFor(ed) {
+    const t = edTab(ed);
+    if (!t || !ed.gutter) return;
+    const src = ed.input.value;
     const wrap = state.settings.wordWrap;
+    const focusedHere = activeEd() === ed;
     const lines = src.split("\n");
-    const curLine = wrap ? -1 : currentLine();
+    const curLine = (wrap || !focusedHere) ? -1 : lineAt(ed);
     let html = "";
     for (let i = 0; i < lines.length; i++) {
       html += '<span class="lnum' + (i + 1 === curLine ? " active" : "") + '">' + (i + 1) + "</span>";
     }
-    dom.gutter.innerHTML = html;
-    dom.gutter.scrollTop = dom.codeScroll.scrollTop;
+    ed.gutter.innerHTML = html;
+    ed.gutter.scrollTop = ed.scroll.scrollTop;
   }
 
-  function currentLine() {
-    const pos = dom.input.selectionStart;
-    return dom.input.value.slice(0, pos).split("\n").length;
+  function lineAt(ed) {
+    const pos = ed.input.selectionStart;
+    return ed.input.value.slice(0, pos).split("\n").length;
   }
+  function currentLine() { return lineAt(primaryEd); }
 
   function injectFindMarks(html, src) {
     // Rebuild highlighted HTML with find marks by operating on plain text ranges
@@ -784,33 +935,43 @@
 
   function renderTree() {
     dom.tree.innerHTML = "";
-    // folders
+    // folders (with expand/collapse + nested, indented children)
     state.folders.forEach((f) => {
+      const collapsed = !!f.collapsed;
       const li = document.createElement("li");
-      li.innerHTML = '<div class="node node--folder" data-folder="' + f.id + '" data-droptarget="' + f.id + '">' +
-        '<span class="ic">🗀</span><span class="nm">' + escapeHtml(f.name) + "</span>" +
-        '<button class="del" title="Delete folder">✕</button></div><ul class="children" data-droptarget="' + f.id + '"></ul>';
+      li.className = "tree-item";
+      li.innerHTML =
+        '<div class="node node--folder" data-folder="' + f.id + '" data-droptarget="' + f.id + '" data-depth="0" style="padding-left:6px">' +
+          '<span class="chevron" data-chevron aria-hidden="true">' + (collapsed ? "▸" : "▾") + "</span>" +
+          '<span class="ic">' + (collapsed ? "🗀" : "🗁") + "</span>" +
+          '<span class="nm">' + escapeHtml(f.name) + "</span>" +
+          '<button class="del" title="Delete folder">✕</button></div>' +
+        '<ul class="children" data-droptarget="' + f.id + '"' + (collapsed ? " hidden" : "") + "></ul>";
       const ul = li.querySelector(".children");
       const kids = state.tabs.filter((t) => t.folder === f.id);
-      if (!kids.length) ul.innerHTML = '<li class="empty-folder">empty</li>';
-      kids.forEach((t) => ul.appendChild(fileNode(t)));
+      if (!kids.length) ul.innerHTML = '<li class="empty-folder" style="padding-left:40px">empty</li>';
+      kids.forEach((t) => ul.appendChild(fileNode(t, 1)));
       dom.tree.appendChild(li);
     });
-    // root drop target + files
+    // root drop target + files (depth 0)
     const rootWrap = document.createElement("li");
     rootWrap.className = "root-drop";
     rootWrap.dataset.droptarget = "";
     const ul = document.createElement("ul");
     ul.className = "children children--root";
     ul.dataset.droptarget = "";
-    state.tabs.filter((t) => !t.folder).forEach((t) => ul.appendChild(fileNode(t)));
+    state.tabs.filter((t) => !t.folder).forEach((t) => ul.appendChild(fileNode(t, 0)));
     rootWrap.appendChild(ul);
     dom.tree.appendChild(rootWrap);
   }
 
-  function fileNode(t) {
+  function fileNode(t, depth) {
+    depth = depth || 0;
+    const pad = 8 + depth * 16 + 16; // align icon under the folder icon; +16 per depth level
     const li = document.createElement("li");
-    li.innerHTML = '<div class="node' + (t.id === state.activeId ? " active" : "") + '" data-id="' + t.id + '" draggable="true">' +
+    li.innerHTML = '<div class="node' + (t.id === state.activeId ? " active" : "") +
+      (state.secondary.open && t.id === state.secondary.tabId ? " node--insplit" : "") +
+      '" data-id="' + t.id + '" draggable="true" data-depth="' + depth + '" style="padding-left:' + pad + 'px">' +
       '<span class="ic">' + fileIcon(t.lang) + "</span>" +
       '<span class="nm">' + escapeHtml(t.name) + "</span>" +
       (t.dirty ? '<span class="dot" title="Unsaved">●</span>' : '<button class="del" title="Delete">✕</button>') +
@@ -833,23 +994,40 @@
       $("#stPos").textContent = "Ln 1, Col 1";
       $("#stSize").textContent = "0 B";
       $("#stSel").hidden = true;
-      return;
+    } else {
+      $("#stLang").textContent = LANGS[t.lang].label;
+      $("#stSize").textContent = formatBytes(new Blob([t.content]).size);
+      $("#stEol").textContent = state.settings.eol;
+      $("#stIndent").textContent = (state.settings.insertSpaces ? "Spaces: " : "Tab Size: ") + state.settings.tabSize;
+      updateCursorStatusFor(primaryEd);
     }
-    $("#stLang").textContent = LANGS[t.lang].label;
-    $("#stSize").textContent = formatBytes(new Blob([t.content]).size);
-    $("#stEol").textContent = state.settings.eol;
-    $("#stIndent").textContent = (state.settings.insertSpaces ? "Spaces: " : "Tab Size: ") + state.settings.tabSize;
-    updateCursorStatus();
+    // Split status bar when the second pane is an editor (todo3 item 5)
+    const split = secondaryIsEditor();
+    $("#statusSecondary").hidden = !split;
+    if (split) {
+      const t2 = edTab(secEd);
+      $("#stLang2").textContent = t2 ? LANGS[t2.lang].label : "Plain Text";
+      $("#stSize2").textContent = t2 ? formatBytes(new Blob([t2.content]).size) : "0 B";
+      updateCursorStatusFor(secEd);
+    }
+    $("#statusPrimary").classList.toggle("active", !split || activeEd() === primaryEd);
+    $("#statusSecondary").classList.toggle("active", split && activeEd() === secEd);
   }
 
-  function updateCursorStatus() {
-    const val = dom.input.value;
-    const start = dom.input.selectionStart, end = dom.input.selectionEnd;
+  function updateCursorStatus() { updateCursorStatusFor(activeEd()); }
+
+  function updateCursorStatusFor(ed) {
+    if (!ed || !ed.input) return;
+    const isPrimary = ed.isPrimary;
+    const posEl = $(isPrimary ? "#stPos" : "#stPos2");
+    const selEl = $(isPrimary ? "#stSel" : "#stSel2");
+    if (!posEl) return;
+    const val = ed.input.value;
+    const start = ed.input.selectionStart, end = ed.input.selectionEnd;
     const before = val.slice(0, start);
     const line = before.split("\n").length;
     const col = start - before.lastIndexOf("\n");
-    $("#stPos").textContent = "Ln " + line + ", Col " + col;
-    const selEl = $("#stSel");
+    posEl.textContent = "Ln " + line + ", Col " + col;
     if (end > start) {
       const selLen = end - start;
       const selLines = val.slice(start, end).split("\n").length;
@@ -868,6 +1046,7 @@
       dirty: false, cursor: 0, scrollTop: 0, scrollLeft: 0, folder: folder || null,
     };
     state.tabs.push(t);
+    UndoMgr.seed(t);
     setActive(t.id);
     renderAll();
     persist();
@@ -903,6 +1082,7 @@
     if (idx < 0) return;
     const t = state.tabs[idx];
     if (t.dirty && !safeConfirm('"' + t.name + '" has unsaved changes. Close anyway?')) return;
+    pushClosed(t, id === state.secondary.tabId ? "secondary" : "primary");
     state.tabs.splice(idx, 1);
     if (state.activeId === id) {
       const next = state.tabs[idx] || state.tabs[idx - 1] || null;
@@ -921,6 +1101,7 @@
   function closeTabForce(id) {
     const idx = state.tabs.findIndex((t) => t.id === id);
     if (idx < 0) return;
+    pushClosed(state.tabs[idx], id === state.secondary.tabId ? "secondary" : "primary");
     state.tabs.splice(idx, 1);
     if (state.activeId === id) {
       const next = state.tabs[idx] || state.tabs[idx - 1] || null;
@@ -932,7 +1113,7 @@
 
   // "Save" = download the file (browser sandbox has no real FS write).
   function saveFile() {
-    const t = activeTab();
+    const t = edTab(activeEd()) || activeTab();
     if (!t) return;
     const blob = new Blob([normalizeEol(t.content)], { type: "text/plain;charset=utf-8" });
     const a = document.createElement("a");
@@ -996,14 +1177,15 @@
     return state.settings.insertSpaces ? " ".repeat(state.settings.tabSize) : "\t";
   }
 
-  function handleTabKey(e) {
+  function handleTabKey(e, ed) {
+    ed = ed || activeEd();
     e.preventDefault();
-    const el = dom.input;
+    const el = ed.input;
     const start = el.selectionStart, end = el.selectionEnd;
     const val = el.value;
     const unit = indentUnit();
     if (start === end && !e.shiftKey) {
-      insertText(unit);
+      insertText(unit, ed);
       return;
     }
     // multi-line indent / dedent
@@ -1023,19 +1205,21 @@
     el.value = before + newBlock + after;
     el.selectionStart = ls;
     el.selectionEnd = ls + newBlock.length;
-    onInput();
+    onEditorInput(ed);
   }
 
-  function insertText(text) {
-    const el = dom.input;
+  function insertText(text, ed) {
+    ed = ed || activeEd();
+    const el = ed.input;
     const start = el.selectionStart, end = el.selectionEnd;
     el.value = el.value.slice(0, start) + text + el.value.slice(end);
     el.selectionStart = el.selectionEnd = start + text.length;
-    onInput();
+    onEditorInput(ed);
   }
 
-  function handleEnterAutoIndent(e) {
-    const el = dom.input;
+  function handleEnterAutoIndent(e, ed) {
+    ed = ed || activeEd();
+    const el = ed.input;
     if (el.selectionStart !== el.selectionEnd) return;
     const val = el.value;
     const start = el.selectionStart;
@@ -1047,21 +1231,22 @@
     if (/[\{\[\(:]\s*$/.test(lineStr)) indent += indentUnit();
     if (!indent) return; // default behaviour
     e.preventDefault();
-    insertText("\n" + indent);
+    insertText("\n" + indent, ed);
   }
 
-  function autoClosePair(e) {
+  function autoClosePair(e, ed) {
+    ed = ed || activeEd();
     const pairs = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'", "`": "`" };
     const ch = e.key;
     if (!pairs[ch]) return false;
-    const el = dom.input;
+    const el = ed.input;
     if (el.selectionStart !== el.selectionEnd) {
       // wrap selection
       e.preventDefault();
       const s = el.selectionStart, en = el.selectionEnd, val = el.value;
       el.value = val.slice(0, s) + ch + val.slice(s, en) + pairs[ch] + val.slice(en);
       el.selectionStart = s + 1; el.selectionEnd = en + 1;
-      onInput();
+      onEditorInput(ed);
       return true;
     }
     return false;
@@ -1071,14 +1256,16 @@
      Find / Replace
      --------------------------------------------------------- */
   const findWidget = $("#findWidget");
+  let findEd = primaryEd; // the pane the find widget currently searches
 
   function openFind(withReplace) {
-    const t = activeTab();
-    if (!t) return;
+    const ed = activeEd();
+    if (!edTab(ed)) return;
+    findEd = ed;
     state.find.open = true;
     findWidget.hidden = false;
     // seed with selection
-    const sel = dom.input.value.slice(dom.input.selectionStart, dom.input.selectionEnd);
+    const sel = ed.input.value.slice(ed.input.selectionStart, ed.input.selectionEnd);
     if (sel && !sel.includes("\n")) { $("#findInput").value = sel; state.find.query = sel; }
     runFind();
     $("#findInput").focus();
@@ -1090,8 +1277,8 @@
     state.find.hits = [];
     state.find.index = -1;
     findWidget.hidden = true;
-    renderHighlight();
-    dom.input.focus();
+    renderHighlightFor(findEd);
+    if (findEd.input) findEd.input.focus();
   }
 
   function buildFindRegex() {
@@ -1108,8 +1295,8 @@
     const f = state.find;
     const re = buildFindRegex();
     f.hits = [];
-    if (re) {
-      const src = dom.input.value;
+    if (re && findEd.input) {
+      const src = findEd.input.value;
       let m, guard = 0;
       while ((m = re.exec(src)) && guard++ < 100000) {
         if (m[0] === "") { re.lastIndex++; continue; }
@@ -1118,7 +1305,7 @@
     }
     f.index = f.hits.length ? 0 : -1;
     $("#findCount").textContent = (f.index + 1) + "/" + f.hits.length;
-    renderHighlight();
+    renderHighlightFor(findEd);
     if (f.index >= 0) scrollToHit(f.index, false);
   }
 
@@ -1128,45 +1315,45 @@
     f.index = (f.index + dir + f.hits.length) % f.hits.length;
     $("#findCount").textContent = (f.index + 1) + "/" + f.hits.length;
     scrollToHit(f.index, true);
-    renderHighlight();
+    renderHighlightFor(findEd);
   }
 
   function scrollToHit(i, select) {
     const h = state.find.hits[i];
-    if (!h) return;
+    if (!h || !findEd.input) return;
     if (select) {
-      dom.input.focus();
-      dom.input.setSelectionRange(h.start, h.end);
+      findEd.input.focus();
+      findEd.input.setSelectionRange(h.start, h.end);
       $("#findInput").focus();
     }
     // approximate vertical scroll
-    const line = dom.input.value.slice(0, h.start).split("\n").length;
+    const line = findEd.input.value.slice(0, h.start).split("\n").length;
     const lineH = state.settings.fontSize * 1.5;
     const target = (line - 1) * lineH;
-    const view = dom.codeScroll.clientHeight;
-    if (target < dom.codeScroll.scrollTop || target > dom.codeScroll.scrollTop + view - lineH * 2) {
-      dom.codeScroll.scrollTop = Math.max(0, target - view / 2);
+    const view = findEd.scroll.clientHeight;
+    if (target < findEd.scroll.scrollTop || target > findEd.scroll.scrollTop + view - lineH * 2) {
+      findEd.scroll.scrollTop = Math.max(0, target - view / 2);
     }
   }
 
   function replaceOne() {
     const f = state.find;
-    if (f.index < 0 || !f.hits[f.index]) return;
+    if (f.index < 0 || !f.hits[f.index] || !findEd.input) return;
     const h = f.hits[f.index];
     const rep = f.replace;
-    const val = dom.input.value;
-    dom.input.value = val.slice(0, h.start) + rep + val.slice(h.end);
-    onInput();
+    const val = findEd.input.value;
+    findEd.input.value = val.slice(0, h.start) + rep + val.slice(h.end);
+    onEditorInput(findEd);
     runFind();
   }
 
   function replaceAll() {
     const f = state.find;
     const re = buildFindRegex();
-    if (!re) return;
+    if (!re || !findEd.input) return;
     const count = f.hits.length;
-    dom.input.value = dom.input.value.replace(re, f.replace);
-    onInput();
+    findEd.input.value = findEd.input.value.replace(re, f.replace);
+    onEditorInput(findEd);
     runFind();
     toast("Replaced " + count + " occurrence" + (count === 1 ? "" : "s"), "ok");
   }
@@ -1180,7 +1367,11 @@
     { id: "file.save", title: "Save File (download)", kb: "Ctrl+S", run: saveFile },
     { id: "file.newFolder", title: "New Folder", run: newFolder },
     { id: "file.rename", title: "Rename Active File", run: () => { const el = dom.tabs.querySelector(".tab.active"); if (el) startInlineRename(el); } },
-    { id: "file.close", title: "Close Active Tab", kb: "Ctrl+W", run: () => state.activeId && closeTab(state.activeId) },
+    { id: "file.close", title: "Close Active Tab", kb: "Ctrl+W", run: () => closeFocusedTab() },
+    { id: "file.closeOthers", title: "Close Other Tabs", kb: "Ctrl+Shift+W", run: () => state.activeId && closeOtherTabs(state.activeId) },
+    { id: "file.reopen", title: "Reopen Last Closed Tab", kb: "Ctrl+Shift+T", run: reopenLastClosed },
+    { id: "edit.undo", title: "Undo", kb: "Ctrl+Z", run: doUndo },
+    { id: "edit.redo", title: "Redo", kb: "Ctrl+Y", run: doRedo },
     { id: "edit.find", title: "Find / Replace", kb: "Ctrl+F", run: () => openFind(true) },
     { id: "edit.gotoLine", title: "Go to Line…", kb: "Ctrl+G", run: openGoto },
     { id: "edit.trimWhitespace", title: "Trim Trailing Whitespace", run: trimTrailing },
@@ -1259,42 +1450,46 @@
      Editing commands
      --------------------------------------------------------- */
   function trimTrailing() {
-    const el = dom.input;
+    const ed = activeEd();
+    const el = ed.input;
     const pos = el.selectionStart;
     el.value = el.value.replace(/[ \t]+$/gm, "");
     el.selectionStart = el.selectionEnd = Math.min(pos, el.value.length);
-    onInput();
+    onEditorInput(ed);
     toast("Trimmed trailing whitespace", "ok");
   }
 
   function convertIndent(toSpaces) {
-    const el = dom.input;
+    const ed = activeEd();
+    const el = ed.input;
     const size = state.settings.tabSize;
     if (toSpaces) el.value = el.value.replace(/^\t+/gm, (m) => " ".repeat(m.length * size));
     else el.value = el.value.replace(/^ +/gm, (m) => "\t".repeat(Math.floor(m.length / size)) + " ".repeat(m.length % size));
     state.settings.insertSpaces = toSpaces;
-    onInput();
+    onEditorInput(ed);
     saveSettings();
     renderStatus();
   }
 
   function duplicateLine() {
-    const el = dom.input, val = el.value, pos = el.selectionStart;
+    const ed = activeEd();
+    const el = ed.input, val = el.value, pos = el.selectionStart;
     const ls = val.lastIndexOf("\n", pos - 1) + 1;
     let le = val.indexOf("\n", pos); if (le < 0) le = val.length;
     const line = val.slice(ls, le);
     el.value = val.slice(0, le) + "\n" + line + val.slice(le);
     el.selectionStart = el.selectionEnd = pos + line.length + 1;
-    onInput();
+    onEditorInput(ed);
   }
 
   function deleteLine() {
-    const el = dom.input, val = el.value, pos = el.selectionStart;
+    const ed = activeEd();
+    const el = ed.input, val = el.value, pos = el.selectionStart;
     const ls = val.lastIndexOf("\n", pos - 1) + 1;
     let le = val.indexOf("\n", pos); if (le < 0) le = val.length; else le += 1;
     el.value = val.slice(0, ls) + val.slice(le);
     el.selectionStart = el.selectionEnd = ls;
-    onInput();
+    onEditorInput(ed);
   }
 
   /* ---------------------------------------------------------
@@ -1302,25 +1497,26 @@
      --------------------------------------------------------- */
   const gotoOverlay = $("#gotoOverlay");
   function openGoto() {
-    if (!activeTab()) return;
+    if (!activeEd().getTab()) return;
     gotoOverlay.hidden = false;
     $("#gotoInput").value = "";
     $("#gotoInput").focus();
   }
-  function closeGoto() { gotoOverlay.hidden = true; dom.input.focus(); }
+  function closeGoto() { gotoOverlay.hidden = true; activeEd().input.focus(); }
   function doGoto() {
+    const ed = activeEd();
     const n = parseInt($("#gotoInput").value, 10);
     closeGoto();
     if (!n) return;
-    const lines = dom.input.value.split("\n");
+    const lines = ed.input.value.split("\n");
     const line = clamp(n, 1, lines.length);
     let pos = 0;
     for (let i = 0; i < line - 1; i++) pos += lines[i].length + 1;
-    dom.input.focus();
-    dom.input.setSelectionRange(pos, pos);
+    ed.input.focus();
+    ed.input.setSelectionRange(pos, pos);
     const lineH = state.settings.fontSize * 1.5;
-    dom.codeScroll.scrollTop = Math.max(0, (line - 1) * lineH - dom.codeScroll.clientHeight / 2);
-    onSelectionChange();
+    ed.scroll.scrollTop = Math.max(0, (line - 1) * lineH - ed.scroll.clientHeight / 2);
+    onSelectionChangeFor(ed);
   }
 
   /* ---------------------------------------------------------
@@ -1390,6 +1586,7 @@
     document.body.classList.toggle("wrap", s.wordWrap);
     dom.input.setAttribute("wrap", s.wordWrap ? "soft" : "off");
     renderHighlight();
+    if (secEd.input) { secEd.input.style.tabSize = s.tabSize; secEd.input.setAttribute("wrap", s.wordWrap ? "soft" : "off"); renderHighlightFor(secEd); }
   }
 
   /* ---------------------------------------------------------
@@ -1506,12 +1703,14 @@
 
   function closeSecondary() {
     state.secondary.open = false;
+    state.focused = "primary";
     dom.paneSecondary.hidden = true;
     dom.splitter.hidden = true;
     secEd.input = secEd.highlight = secEd.gutter = secEd.scroll = secEd.tabId = null;
     dom.panePrimary.style.flex = "";
     dom.paneSecondary.style.flex = "";
     renderTabs();
+    renderStatus();
     persist();
     dom.input.focus();
   }
@@ -1552,6 +1751,8 @@
       dom.secTitle.textContent = b ? b.name : "Second file";
       renderSecEditor(b);
     }
+    // reflect the split status bar (todo3 item 5)
+    renderStatus();
   }
 
   function populateSecFile() {
@@ -1577,20 +1778,58 @@
     dom.secBody.appendChild(div);
   }
 
+  const tableState = { tabId: null, filters: [] };
+
   function renderTable(t) {
     const rows = parseCsv(t.content);
     if (!rows.length) { dom.secBody.innerHTML = '<div class="sec-empty">No rows to display.</div>'; return; }
     const maxCols = rows.reduce((m, r) => Math.max(m, r.length), 0);
-    let html = '<div class="table-wrap"><table class="data-table"><thead><tr><th class="rownum"></th>';
+    if (tableState.tabId !== t.id) { tableState.tabId = t.id; tableState.filters = new Array(maxCols).fill(""); }
+    if (tableState.filters.length < maxCols) tableState.filters = tableState.filters.concat(new Array(maxCols - tableState.filters.length).fill(""));
+    renderTableInner(rows, maxCols);
+  }
+
+  function renderTableInner(rows, maxCols) {
+    const filters = tableState.filters;
+    const active = filters.map((f) => (f || "").trim().toLowerCase());
+    const anyFilter = active.some((f) => f);
+    // filter, keeping original row indices for the row-number column
+    const filtered = [];
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      let ok = true;
+      for (let c = 0; c < maxCols; c++) { if (active[c] && !String(r[c] != null ? r[c] : "").toLowerCase().includes(active[c])) { ok = false; break; } }
+      if (ok) filtered.push({ r, i });
+    }
+    let html = '<div class="table-toolbar"><span class="table-count">Showing ' + filtered.length + " of " + rows.length + " rows</span>" +
+      (anyFilter ? '<button class="text-btn" id="tblClear">Clear filters</button>' : "") + "</div>";
+    html += '<div class="table-wrap"><table class="data-table"><thead>';
+    html += '<tr><th class="rownum">#</th>';
     for (let c = 0; c < maxCols; c++) html += "<th>" + colName(c) + "</th>";
+    html += '</tr><tr class="filter-row"><th class="rownum"></th>';
+    for (let c = 0; c < maxCols; c++) html += '<th><input class="col-filter" data-col="' + c + '" type="text" placeholder="Filter…" value="' + escapeHtml(filters[c] || "") + '" aria-label="Filter column ' + colName(c) + '"></th>';
     html += "</tr></thead><tbody>";
-    for (let ri = 0; ri < rows.length; ri++) {
-      html += '<tr><td class="rownum">' + (ri + 1) + "</td>";
-      for (let c = 0; c < maxCols; c++) html += "<td>" + escapeHtml(rows[ri][c] != null ? rows[ri][c] : "") + "</td>";
+    for (let ri = 0; ri < filtered.length; ri++) {
+      const { r, i } = filtered[ri];
+      html += '<tr><td class="rownum">' + (i + 1) + "</td>";
+      for (let c = 0; c < maxCols; c++) html += "<td>" + escapeHtml(r[c] != null ? r[c] : "") + "</td>";
       html += "</tr>";
     }
     html += "</tbody></table></div>";
     dom.secBody.innerHTML = html; // all cell values escaped -> inert (no formula execution)
+    // wire per-column filters
+    $$(".col-filter", dom.secBody).forEach((inp) => {
+      inp.addEventListener("input", () => {
+        const col = +inp.dataset.col;
+        tableState.filters[col] = inp.value;
+        const pos = inp.selectionStart;
+        renderTableInner(rows, maxCols);
+        const again = dom.secBody.querySelector('.col-filter[data-col="' + col + '"]');
+        if (again) { again.focus(); try { again.setSelectionRange(pos, pos); } catch (e) {} }
+      });
+    });
+    const clr = $("#tblClear", dom.secBody);
+    if (clr) clr.addEventListener("click", () => { tableState.filters = new Array(maxCols).fill(""); renderTableInner(rows, maxCols); });
   }
 
   function renderDiff(a, b) {
@@ -1612,7 +1851,7 @@
     if (!b) { dom.secBody.innerHTML = '<div class="sec-empty">No second file selected.</div>'; secEd.input = null; secEd.tabId = null; return; }
     if (secEd.input && secEd.tabId === b.id && dom.secBody.contains(secEd.input)) {
       if (secEd.input.value !== b.content) secEd.input.value = b.content;
-      highlightSec(b);
+      renderHighlightFor(secEd);
       return;
     }
     dom.secBody.innerHTML =
@@ -1626,34 +1865,12 @@
     secEd.tabId = b.id;
     secEd.input.value = b.content;
     secEd.input.style.tabSize = state.settings.tabSize;
-    secEd.input.addEventListener("input", () => {
-      const tab = tabById(secEd.tabId);
-      if (!tab) return;
-      tab.content = secEd.input.value; tab.dirty = true;
-      highlightSec(tab); renderTabs(); renderTree(); persist();
-    });
-    secEd.scroll.addEventListener("scroll", () => { secEd.gutter.scrollTop = secEd.scroll.scrollTop; });
-    secEd.input.addEventListener("keydown", (e) => {
-      if (e.key === "Tab") {
-        e.preventDefault();
-        const el = secEd.input, s = el.selectionStart, en = el.selectionEnd, unit = indentUnit();
-        el.value = el.value.slice(0, s) + unit + el.value.slice(en);
-        el.selectionStart = el.selectionEnd = s + unit.length;
-        const tab = tabById(secEd.tabId); if (tab) { tab.content = el.value; tab.dirty = true; }
-        highlightSec(tabById(secEd.tabId)); renderTabs(); persist();
-      }
-    });
-    highlightSec(b);
+    UndoMgr.seed(b);
+    attachEditorEvents(secEd); // same behaviour as the primary pane (todo3 item 7)
+    renderHighlightFor(secEd);
   }
 
-  function highlightSec(b) {
-    if (!secEd.highlight || !b) return;
-    secEd.highlight.innerHTML = Highlight.run(secEd.input.value, b.lang) + "\n";
-    const lines = secEd.input.value.split("\n");
-    let g = "";
-    for (let i = 0; i < lines.length; i++) g += '<span class="lnum">' + (i + 1) + "</span>";
-    secEd.gutter.innerHTML = g;
-  }
+  function highlightSec(b) { renderHighlightFor(secEd); }
 
   // Drag a tab to a side -> open split view with two notes.
   function splitWithTab(id, side) {
@@ -1688,6 +1905,50 @@
     renderTabs();
     persist();
   }
+
+  // Move a tab one position left/right within the strip (todo3 item 3).
+  function moveTab(id, dir) {
+    const from = state.tabs.findIndex((t) => t.id === id);
+    if (from < 0) return;
+    const to = clamp(from + dir, 0, state.tabs.length - 1);
+    if (to === from) return;
+    const [moved] = state.tabs.splice(from, 1);
+    state.tabs.splice(to, 0, moved);
+    renderTabs();
+    persist();
+  }
+
+  // Close every tab except the given one.
+  function closeOtherTabs(keepId) {
+    const others = state.tabs.filter((t) => t.id !== keepId);
+    for (const t of others) {
+      if (t.dirty && !safeConfirm('"' + t.name + '" has unsaved changes. Close anyway?')) continue;
+      pushClosed(t, "primary");
+      state.tabs = state.tabs.filter((x) => x.id !== t.id);
+    }
+    if (!state.tabs.some((t) => t.id === state.activeId)) state.activeId = keepId;
+    if (!state.tabs.some((t) => t.id === state.secondary.tabId)) closeSecondary();
+    renderAll();
+    persist();
+  }
+
+  // Open a tab in the secondary pane as an editor (split).
+  function splitTabToSecondary(id) {
+    const others = state.tabs.filter((t) => t.id !== id);
+    if (!others.length) { toast("Open a second file to split", "err"); return; }
+    if (state.activeId === id) state.activeId = others[0].id;
+    openSecondary("editor", id);
+    renderAll();
+  }
+
+  // --- Keyboard actions scoped to the focused pane (todo3 items 6-8) ---
+  function closeFocusedTab() {
+    const t = edTab(activeEd());
+    if (t) closeTab(t.id);
+    else if (state.activeId) closeTab(state.activeId);
+  }
+  function doUndo() { const ed = activeEd(); const t = edTab(ed); if (t) UndoMgr.undo(t, ed); }
+  function doRedo() { const ed = activeEd(); const t = edTab(ed); if (t) UndoMgr.redo(t, ed); }
 
   function startInlineRename(tabEl) {
     const t = tabById(tabEl.dataset.id);
@@ -1775,6 +2036,36 @@
     persist();
   }
 
+  function toggleFolder(fid) {
+    const f = state.folders.find((x) => x.id === fid);
+    if (!f) return;
+    f.collapsed = !f.collapsed;
+    renderTree();
+    persist();
+  }
+
+  // Create a file inside a folder (context menu). Auto-expands the folder and
+  // drops the new item straight into inline rename mode (todo3 item 2).
+  function newFileInFolder(folderId) {
+    const f = state.folders.find((x) => x.id === folderId);
+    if (f) f.collapsed = false;
+    const t = newFile(undefined, "", folderId);
+    // newFile() already re-rendered the tree, so the node exists now.
+    const el = dom.tree.querySelector('.node[data-id="' + t.id + '"]');
+    if (el) treeInlineRename(el);
+  }
+
+  function duplicateFile(id) {
+    const t = tabById(id);
+    if (!t) return;
+    const dot = t.name.lastIndexOf(".");
+    const base = dot > 0 ? t.name.slice(0, dot) : t.name;
+    const ext = dot > 0 ? t.name.slice(dot) : "";
+    let name, n = 1;
+    do { name = base + " copy" + (n > 1 ? " " + n : "") + ext; n++; } while (state.tabs.some((x) => x.name === name));
+    newFile(name, t.content, t.folder);
+  }
+
   /* ---------------------------------------------------------
      Persistence of full session
      --------------------------------------------------------- */
@@ -1817,48 +2108,62 @@
   /* ---------------------------------------------------------
      Input & event wiring
      --------------------------------------------------------- */
-  function onInput() {
-    const t = activeTab();
+  function onEditorInput(ed) {
+    ed = ed || activeEd();
+    const t = edTab(ed);
     if (!t) return;
-    t.content = dom.input.value;
+    t.content = ed.input.value;
     t.dirty = true;
-    if (state.find.open) runFind();
-    scheduleHighlight();
+    UndoMgr.record(t, ed);
+    if (state.find.open && findEd === ed) runFind();
+    if (ed.isPrimary) scheduleHighlight(); else scheduleHighlightSec();
     renderTabs();
     renderTree();
     renderStatus();
-    if (state.secondary.open && state.secondary.mode !== "editor") scheduleSecondary();
+    if (ed.isPrimary && state.secondary.open && state.secondary.mode !== "editor") scheduleSecondary();
     persist();
   }
+  function onInput() { onEditorInput(primaryEd); }
 
-  function onScroll() {
-    // sync highlight + gutter to textarea scroll
-    dom.highlight.parentElement.style.transform = "";
-    dom.gutter.scrollTop = dom.codeScroll.scrollTop;
-    const t = activeTab();
-    if (t) { t.scrollTop = dom.codeScroll.scrollTop; t.scrollLeft = dom.codeScroll.scrollLeft; }
+  const scheduleHighlightSec = debounce(() => renderHighlightFor(secEd), 40);
+
+  function onScrollFor(ed) {
+    ed.gutter.scrollTop = ed.scroll.scrollTop;
+    const t = edTab(ed);
+    if (t) { t.scrollTop = ed.scroll.scrollTop; t.scrollLeft = ed.scroll.scrollLeft; }
   }
+  function onScroll() { onScrollFor(primaryEd); }
 
-  function onSelectionChange() {
-    updateCursorStatus();
-    if (!state.settings.wordWrap) renderGutter(dom.input.value);
+  function onSelectionChangeFor(ed) {
+    state.focused = ed.isPrimary ? "primary" : "secondary";
+    updateCursorStatusFor(ed);
+    if (!state.settings.wordWrap) renderGutterFor(ed);
+    $("#statusPrimary").classList.toggle("active", activeEd() === primaryEd);
+    $("#statusSecondary").classList.toggle("active", secondaryIsEditor() && activeEd() === secEd);
+  }
+  function onSelectionChange() { onSelectionChangeFor(primaryEd); }
+
+  // Attach the unified editor behaviour to a pane (used by primary + secondary
+  // so every shortcut/edit works identically in the right-side pane — todo3 item 7).
+  function attachEditorEvents(ed) {
+    ed.input.addEventListener("input", () => onEditorInput(ed));
+    ed.scroll.addEventListener("scroll", () => onScrollFor(ed));
+    ed.input.addEventListener("keyup", () => onSelectionChangeFor(ed));
+    ed.input.addEventListener("click", () => onSelectionChangeFor(ed));
+    ed.input.addEventListener("select", () => onSelectionChangeFor(ed));
+    ed.input.addEventListener("focus", () => { state.focused = ed.isPrimary ? "primary" : "secondary"; onSelectionChangeFor(ed); });
+    ed.input.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") { handleTabKey(e, ed); return; }
+      if (e.key === "Enter") { handleEnterAutoIndent(e, ed); return; }
+      autoClosePair(e, ed);
+    });
   }
 
   function wire() {
     let draggingTabId = null, draggingFileId = null;
 
-    // Text input
-    dom.input.addEventListener("input", onInput);
-    dom.codeScroll.addEventListener("scroll", onScroll);
-    dom.input.addEventListener("keyup", onSelectionChange);
-    dom.input.addEventListener("click", onSelectionChange);
-    dom.input.addEventListener("select", onSelectionChange);
-
-    dom.input.addEventListener("keydown", (e) => {
-      if (e.key === "Tab") { handleTabKey(e); return; }
-      if (e.key === "Enter") { handleEnterAutoIndent(e); return; }
-      if (autoClosePair(e)) return;
-    });
+    // Primary editor behaviour (unified with the secondary pane)
+    attachEditorEvents(primaryEd);
 
     // Menu buttons / data-cmd
     document.body.addEventListener("click", (e) => {
@@ -1877,6 +2182,34 @@
     dom.tabs.addEventListener("dblclick", (e) => {
       const tab = e.target.closest(".tab");
       if (tab && e.target.classList.contains("tname")) startInlineRename(tab);
+    });
+
+    // Tab context menu (todo3 item 3)
+    dom.tabs.addEventListener("contextmenu", (e) => {
+      const tab = e.target.closest(".tab");
+      if (!tab) return;
+      e.preventDefault();
+      const id = tab.dataset.id;
+      const t = tabById(id);
+      const idx = state.tabs.findIndex((x) => x.id === id);
+      ContextMenu.open(e.clientX, e.clientY, [
+        { label: "Split Editor (Open to Side)", action: () => splitTabToSecondary(id) },
+        (t && t.lang === "markdown") ? { label: "Open Markdown Preview", action: () => { setActive(id); openSecondary("preview"); } } : null,
+        state.secondary.open ? {
+          label: "Move to Other Pane", action: () => {
+            state.secondary.tabId = id;
+            if (state.activeId === id) { const o = state.tabs.find((x) => x.id !== id); if (o) state.activeId = o.id; }
+            setSecMode("editor"); renderAll();
+          }
+        } : null,
+        { separator: true },
+        { label: "Move Tab Left", disabled: idx <= 0, action: () => moveTab(id, -1) },
+        { label: "Move Tab Right", disabled: idx >= state.tabs.length - 1, action: () => moveTab(id, 1) },
+        { separator: true },
+        { label: "Rename", action: () => { const el = dom.tabs.querySelector('.tab[data-id="' + id + '"]'); if (el) startInlineRename(el); } },
+        { label: "Close", kb: "Ctrl+W", action: () => closeTab(id) },
+        { label: "Close Others", disabled: state.tabs.length < 2, action: () => closeOtherTabs(id) },
+      ]);
     });
 
     // Tab drag: reorder within strip, or drag to a side to split
@@ -1911,18 +2244,57 @@
       });
     });
 
-    // File tree: activate / delete / folder delete
+    // File tree: activate / delete / folder delete / expand-collapse
     dom.tree.addEventListener("click", (e) => {
+      const chevron = e.target.closest("[data-chevron]");
       const del = e.target.closest(".del");
       const fileNodeEl = e.target.closest(".node[data-id]");
       const folderNodeEl = e.target.closest(".node--folder");
       if (del && folderNodeEl) { deleteFolder(folderNodeEl.dataset.folder); return; }
       if (del && fileNodeEl) { deleteFile(fileNodeEl.dataset.id); return; }
+      if (folderNodeEl) { toggleFolder(folderNodeEl.dataset.folder); return; }
       if (fileNodeEl) setActive(fileNodeEl.dataset.id);
     });
     dom.tree.addEventListener("dblclick", (e) => {
       const node = e.target.closest(".node[data-id], .node--folder");
       if (node) treeInlineRename(node);
+    });
+
+    // Explorer context menu (todo3 item 2)
+    dom.tree.addEventListener("contextmenu", (e) => {
+      const fileNodeEl = e.target.closest(".node[data-id]");
+      const folderNodeEl = e.target.closest(".node--folder");
+      if (!fileNodeEl && !folderNodeEl) {
+        e.preventDefault();
+        ContextMenu.open(e.clientX, e.clientY, [
+          { label: "New File", action: () => newFile() },
+          { label: "New Folder", action: () => newFolder() },
+        ]);
+        return;
+      }
+      e.preventDefault();
+      if (folderNodeEl) {
+        const fid = folderNodeEl.dataset.folder;
+        ContextMenu.open(e.clientX, e.clientY, [
+          { label: "New File", action: () => newFileInFolder(fid) },
+          { label: "New Folder", action: () => newFolder() },
+          { label: "Rename", action: () => treeInlineRename(folderNodeEl) },
+          { separator: true },
+          { label: "Delete Folder", action: () => deleteFolder(fid) },
+        ]);
+      } else {
+        const id = fileNodeEl.dataset.id;
+        const t = tabById(id);
+        ContextMenu.open(e.clientX, e.clientY, [
+          { label: "Open", action: () => setActive(id) },
+          { label: "Open to the Side (Split)", action: () => splitTabToSecondary(id) },
+          (t && t.lang === "markdown") ? { label: "Open Preview", action: () => { setActive(id); openSecondary("preview"); } } : null,
+          { label: "Rename", action: () => treeInlineRename(fileNodeEl) },
+          { label: "Duplicate", action: () => duplicateFile(id) },
+          { separator: true },
+          { label: "Delete", action: () => deleteFile(id) },
+        ]);
+      }
     });
 
     // File tree drag-and-drop: move files between folders / root
@@ -2061,7 +2433,14 @@
     if (ctrl && e.key === "g") { e.preventDefault(); openGoto(); return; }
     if (ctrl && e.key === "b") { e.preventDefault(); toggleSidebar(); return; }
     if (ctrl && e.key === ",") { e.preventDefault(); openSettings(); return; }
-    if (ctrl && e.key === "w") { e.preventDefault(); if (state.activeId) closeTab(state.activeId); return; }
+    if (ctrl && e.key === "w") { e.preventDefault(); closeFocusedTab(); return; }
+    if (ctrl && e.shiftKey && (e.key === "w" || e.key === "W")) { e.preventDefault(); state.secondary.open ? closeSecondary() : (state.activeId && closeOtherTabs(state.activeId)); return; }
+    // Reopen last closed. Ctrl+Shift+T is reserved by some browsers; best-effort +
+    // always available via the command palette.
+    if (ctrl && e.shiftKey && (e.key === "t" || e.key === "T")) { e.preventDefault(); reopenLastClosed(); return; }
+    // Undo / redo routed to the focused pane (custom history supports programmatic edits).
+    if (ctrl && !e.shiftKey && (e.key === "z" || e.key === "Z")) { e.preventDefault(); doUndo(); return; }
+    if (ctrl && ((e.shiftKey && (e.key === "z" || e.key === "Z")) || (!e.shiftKey && (e.key === "y" || e.key === "Y")))) { e.preventDefault(); doRedo(); return; }
     if (ctrl && e.key === "\\") { e.preventDefault(); state.secondary.open ? closeSecondary() : openSecondary("editor"); return; }
     if (ctrl && e.shiftKey && (e.key === "c" || e.key === "C")) { e.preventDefault(); openSecondary("diff"); return; }
     if (ctrl && e.shiftKey && (e.key === "v" || e.key === "V")) { e.preventDefault(); openSecondary("preview"); return; }
@@ -2131,12 +2510,14 @@ A fast, self-contained code editor that runs entirely in your browser.
 
 ## Features
 - Multiple tabs with unsaved indicators, inline rename (click the tab name)
-- Syntax highlighting: JS, HTML, CSS, JSON, Markdown, Python, PowerShell, YAML, CSV
+- Right-click **tabs** and the **Explorer** for context menus (split, preview, new file in folder, rename, delete…)
 - Split view — drag a tab to the left/right edge to open two notes side by side
+- Shortcuts (save, close, undo/redo, find…) apply to whichever pane is focused
 - Compare / diff two open files (**Ctrl+Shift+C**)
 - Markdown preview in a side pane (**Ctrl+Shift+V**)
-- Open **.csv** / **.xlsx** to see a safe rendered table next to the raw data
-- Folders + drag-and-drop in the explorer
+- Open **.csv** / **.xlsx** for a safe table with per-column filters and a row count
+- Folders with indentation, indent guides and collapse; drag-and-drop in the explorer
+- Undo **Ctrl+Z** / redo **Ctrl+Y**, reopen last closed **Ctrl+Shift+T**
 - Find & Replace with regex, command palette (**Ctrl+P**)
 - Offline-first — works with no internet, auto-saves locally
 

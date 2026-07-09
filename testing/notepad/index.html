@@ -129,17 +129,29 @@
 
       <!-- Status bar -->
       <footer class="statusbar" role="contentinfo">
-        <div class="statusbar__left">
-          <span id="stLang" class="st-item" title="Language">Plain Text</span>
-          <span id="stTabs" class="st-item" title="Open tabs">0 tabs</span>
+        <div class="statusbar__pane statusbar__pane--primary active" id="statusPrimary" data-pane="primary">
+          <div class="statusbar__left">
+            <span id="stLang" class="st-item" title="Language">Plain Text</span>
+            <span id="stTabs" class="st-item" title="Open tabs">0 tabs</span>
+          </div>
+          <div class="statusbar__right">
+            <span id="stPos" class="st-item" title="Cursor position">Ln 1, Col 1</span>
+            <span id="stSel" class="st-item" hidden></span>
+            <span id="stSize" class="st-item" title="File size">0 B</span>
+            <span id="stEol" class="st-item" title="End of line sequence">LF</span>
+            <span id="stIndent" class="st-item" title="Indentation">Spaces: 2</span>
+            <span id="stEnc" class="st-item" title="Encoding">UTF-8</span>
+          </div>
         </div>
-        <div class="statusbar__right">
-          <span id="stPos" class="st-item" title="Cursor position">Ln 1, Col 1</span>
-          <span id="stSel" class="st-item" hidden></span>
-          <span id="stSize" class="st-item" title="File size">0 B</span>
-          <span id="stEol" class="st-item" title="End of line sequence">LF</span>
-          <span id="stIndent" class="st-item" title="Indentation">Spaces: 2</span>
-          <span id="stEnc" class="st-item" title="Encoding">UTF-8</span>
+        <div class="statusbar__pane statusbar__pane--secondary" id="statusSecondary" data-pane="secondary" hidden>
+          <div class="statusbar__left">
+            <span id="stLang2" class="st-item" title="Language (right pane)">Plain Text</span>
+          </div>
+          <div class="statusbar__right">
+            <span id="stPos2" class="st-item" title="Cursor position (right pane)">Ln 1, Col 1</span>
+            <span id="stSel2" class="st-item" hidden></span>
+            <span id="stSize2" class="st-item" title="File size (right pane)">0 B</span>
+          </div>
         </div>
       </footer>
     </main>
