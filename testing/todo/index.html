@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes & Todo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .todo-input {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background: #DAA520;
+            color: black;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        button:hover {
+            background: #B8860B;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .todo-text {
+            flex: 1;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .new-day-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .new-day-btn:hover {
+            background: #c82333;
+        }
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px;
+            background: #DAA520;
+            color: black;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark-mode-toggle:hover {
+            background: #B8860B;
+        }
+        body.dark-mode {
+            background-color: #222;
+            color: #fff;
+        }
+        body.dark-mode .section {
+            background: #333;
+            color: #fff;
+        }
+        body.dark-mode textarea,
+        body.dark-mode input[type="text"] {
+            background: #444;
+            color: #fff;
+            border: 1px solid #666;
+        }
+        body.dark-mode button {
+            background: #555;
+            color: #fff;
+        }
+        body.dark-mode button:hover {
+            background: #666;
+        }
+        body.dark-mode .completed {
+            color: #aaa;
+        }
+        body.dark-mode h1 {
+            color: #DAA520;
+        }
+        body.dark-mode textarea[readonly] {
+            background: #555;
+            color: #fff;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #DAA520;
+            border-radius: 6px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B8860B;
+        }
+        body.dark-mode ::-webkit-scrollbar-track {
+            background: #333;
+        }
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background: #DAA520;
+        }
+        body.dark-mode ::-webkit-scrollbar-thumb:hover {
+            background: #B8860B;
+        }
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #DAA520 #f1f1f1;
+        }
+        body.dark-mode * {
+            scrollbar-color: #DAA520 #333;
+        }
+    </style>
+</head>
+<body>
+    <pre style="display: none;">
+  /\_/\  
+ ( o.o ) 
+  > ^ < 
+You're looking at my code! 😺
+Lovely to see you here.
+Have a great day!
+Rami
+    </pre>
+    <h1>Notes & Todo Lists</h1>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">☀️</button>
+    <button class="new-day-btn" onclick="newDay()">New Day</button>
+
+    <div class="section">
+        <h2>Notes</h2>
+        <textarea id="notes" placeholder="Write your notes here..." autofocus></textarea>
+        <button onclick="insertDateTime()" title="Insert Date/Time (or press ESC)">Insert Date/Time (or press ESC)</button>
+    </div>
+
+    <div class="section">
+        <h2>Todo List</h2>
+        <div class="todo-input">
+            <input type="text" id="new-todo" placeholder="Add a new todo item...">
+            <button onclick="addTodo()">Add</button>
+        </div>
+        <ul id="todo-list"></ul>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotes();
+            loadTodos();
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+
+        // Notes functionality
+        const notesTextarea = document.getElementById('notes');
+
+        function loadNotes() {
+            const savedNotes = localStorage.getItem('notes');
+            if (savedNotes) {
+                notesTextarea.value = savedNotes;
+            }
+            autoResizeTextarea();
+        }
+
+        notesTextarea.addEventListener('input', function() {
+            localStorage.setItem('notes', notesTextarea.value);
+            autoResizeTextarea();
+        });
+
+        function insertDateTime() {
+            const now = new Date();
+            const dt = now.toLocaleString();
+            notesTextarea.value += '\n' + dt;
+            localStorage.setItem('notes', notesTextarea.value);
+            autoResizeTextarea();
+        }
+
+        function autoResizeTextarea(textarea = notesTextarea) {
+            textarea.style.height = 'auto';
+            const maxHeight = window.innerHeight / 2;
+            const scrollHeight = textarea.scrollHeight;
+            const minHeight = textarea.id === 'last-day-notes' ? 250 : 0;
+            textarea.style.height = Math.max(minHeight, Math.min(scrollHeight, maxHeight)) + 'px';
+        }
+
+        function newDay() {
+            if (confirm("This will move current notes to 'Last Day's Notes' and clear them, keeping unfinished todos. Are you sure?")) {
+                // Save current notes
+                localStorage.setItem('last_day_notes', notesTextarea.value);
+                // Clear notes
+                notesTextarea.value = '';
+                localStorage.setItem('notes', '');
+                // Remove completed todos
+                const lis = todoList.querySelectorAll('li');
+                lis.forEach(li => {
+                    if (li.querySelector('input[type="checkbox"]').checked) {
+                        li.remove();
+                    }
+                });
+                saveTodos();
+                // Update last day section if visible
+                const textarea = document.getElementById('last-day-notes');
+                if (textarea) {
+                    textarea.value = localStorage.getItem('last_day_notes');
+                    autoResizeTextarea(textarea);
+                }
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        function toggleLastDayNotes() {
+            const section = document.getElementById('last-day-section');
+            const textarea = document.getElementById('last-day-notes');
+            const lastNotes = localStorage.getItem('last_day_notes');
+            if (lastNotes) {
+                textarea.value = lastNotes;
+                autoResizeTextarea(textarea);
+                section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            } else {
+                alert('No previous day\'s notes available.');
+            }
+        }
+
+        // Todo functionality
+        const todoInput = document.getElementById('new-todo');
+        const todoList = document.getElementById('todo-list');
+
+        function loadTodos() {
+            const savedTodos = JSON.parse(localStorage.getItem('todos') || '[]');
+            savedTodos.forEach(todo => addTodoToList(todo.text, todo.completed));
+        }
+
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (text) {
+                addTodoToList(text, false);
+                saveTodos();
+                todoInput.value = '';
+            }
+        }
+
+        function addTodoToList(text, completed) {
+            const li = document.createElement('li');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = completed;
+            checkbox.addEventListener('change', function() {
+                span.classList.toggle('completed');
+                saveTodos();
+            });
+
+            const span = document.createElement('span');
+            span.className = 'todo-text';
+            span.textContent = text;
+            if (completed) span.classList.add('completed');
+            span.addEventListener('click', function() {
+                checkbox.click();
+            });
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = function() {
+                li.remove();
+                saveTodos();
+            };
+
+            li.appendChild(checkbox);
+            li.appendChild(span);
+            li.appendChild(deleteBtn);
+            todoList.appendChild(li);
+        }
+
+        function saveTodos() {
+            const todos = [];
+            todoList.querySelectorAll('li').forEach(li => {
+                const text = li.querySelector('.todo-text').textContent;
+                const completed = li.querySelector('input[type="checkbox"]').checked;
+                todos.push({ text, completed });
+            });
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        // Allow adding todo with Enter key
+        todoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // Insert date/time on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                insertDateTime();
+            }
+        });
+
+        // Focus notes textarea when clicking elsewhere on the page
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('input, button, textarea')) {
+                notesTextarea.focus();
+            }
+        });
+    </script>
+
+    <button onclick="toggleLastDayNotes()">Toggle Last Day's Notes</button>
+
+    <div class="section" id="last-day-section" style="display: none;">
+        <h2>Last Day's Notes</h2>
+        <textarea id="last-day-notes" readonly></textarea>
+    </div>
+
+</body>
+</html>
