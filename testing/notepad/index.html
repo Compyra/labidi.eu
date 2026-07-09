@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1e1e1e" />
+  <meta name="description" content="A fast, self-contained, offline-first web code editor." />
+  <title>Note — Web Code Editor</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23007acc'/%3E%3Ctext x='50' y='72' font-size='64' text-anchor='middle' fill='white' font-family='monospace'%3E%7B%7D%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ===== Menu / Toolbar ===== -->
+  <header class="titlebar" role="banner">
+    <div class="titlebar__left">
+      <button class="icon-btn" id="toggleSidebar" title="Toggle Explorer (Ctrl+B)" aria-label="Toggle file explorer">☰</button>
+      <span class="titlebar__brand">Note</span>
+      <nav class="menu" aria-label="Main menu">
+        <button class="menu__btn" data-cmd="file.new">New</button>
+        <button class="menu__btn" data-cmd="file.open">Open</button>
+        <button class="menu__btn" data-cmd="file.save">Save</button>
+        <button class="menu__btn" data-cmd="edit.find">Find</button>
+        <button class="menu__btn" data-cmd="view.splitFile">Split</button>
+        <button class="menu__btn" data-cmd="edit.compare">Compare</button>
+        <button class="menu__btn" data-cmd="view.palette">Commands</button>
+        <button class="menu__btn" data-cmd="app.settings">Settings</button>
+      </nav>
+    </div>
+    <div class="titlebar__right">
+      <span class="conn" id="connStatus" title="Connection status">●</span>
+    </div>
+  </header>
+
+  <!-- ===== Main layout ===== -->
+  <div class="workbench">
+    <!-- File explorer -->
+    <aside class="sidebar" id="sidebar" aria-label="File explorer">
+      <div class="sidebar__head">
+        <span>Explorer</span>
+        <div class="sidebar__actions">
+          <button class="icon-btn" data-cmd="file.new" title="New file">＋</button>
+          <button class="icon-btn" data-cmd="file.newFolder" title="New folder">🗀</button>
+        </div>
+      </div>
+      <ul class="filetree" id="fileTree" role="tree"></ul>
+    </aside>
+
+    <!-- Editor area -->
+    <main class="editor-area" role="main">
+      <div class="tabs" id="tabs" role="tablist" aria-label="Open files"></div>
+
+      <div class="panes" id="panes">
+        <!-- Primary pane -->
+        <section class="pane pane--primary" id="panePrimary">
+          <div class="editor-wrap">
+            <!-- Find / Replace widget -->
+            <div class="find" id="findWidget" hidden>
+              <div class="find__row">
+                <input type="text" id="findInput" placeholder="Find" aria-label="Find" autocomplete="off" spellcheck="false" />
+                <span class="find__count" id="findCount">0/0</span>
+                <button class="icon-btn" id="findPrev" title="Previous (Shift+Enter)">▲</button>
+                <button class="icon-btn" id="findNext" title="Next (Enter)">▼</button>
+                <button class="icon-btn toggle" id="findCase" title="Match case">Aa</button>
+                <button class="icon-btn toggle" id="findWord" title="Whole word">￭</button>
+                <button class="icon-btn toggle" id="findRegex" title="Use regular expression">.*</button>
+                <button class="icon-btn" id="findClose" title="Close (Esc)">✕</button>
+              </div>
+              <div class="find__row">
+                <input type="text" id="replaceInput" placeholder="Replace" aria-label="Replace" autocomplete="off" spellcheck="false" />
+                <button class="text-btn" id="replaceOne">Replace</button>
+                <button class="text-btn" id="replaceAll">All</button>
+              </div>
+            </div>
+
+            <div class="code" id="codeHost">
+              <div class="gutter" id="gutter" aria-hidden="true"></div>
+              <div class="code__scroll" id="codeScroll">
+                <pre class="highlight" id="highlight" aria-hidden="true"><code></code></pre>
+                <textarea class="input" id="input" spellcheck="false" autocomplete="off" autocapitalize="off"
+                  autocorrect="off" wrap="off" aria-label="Code editor"></textarea>
+              </div>
+            </div>
+
+            <div class="empty" id="emptyState">
+              <div class="empty__box">
+                <h1>Note</h1>
+                <p>A self-contained, offline code editor.</p>
+                <ul>
+                  <li><kbd>Alt</kbd>+<kbd>N</kbd> — New file</li>
+                  <li><kbd>Ctrl</kbd>+<kbd>O</kbd> — Open file</li>
+                  <li><kbd>Ctrl</kbd>+<kbd>S</kbd> — Save file</li>
+                  <li><kbd>Ctrl</kbd>+<kbd>P</kbd> — Command palette</li>
+                  <li><kbd>Ctrl</kbd>+<kbd>F</kbd> — Find / Replace</li>
+                </ul>
+                <button class="text-btn primary" data-cmd="file.new">Create a file</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Splitter -->
+        <div class="splitter" id="splitter" hidden role="separator" aria-orientation="vertical" tabindex="0" title="Drag to resize"></div>
+
+        <!-- Secondary pane -->
+        <section class="pane pane--secondary" id="paneSecondary" hidden>
+          <div class="pane__head">
+            <span class="pane__title" id="secTitle">Preview</span>
+            <div class="pane__actions">
+              <select id="secMode" class="pane__select" aria-label="Side pane mode">
+                <option value="preview">Markdown Preview</option>
+                <option value="table">Table View</option>
+                <option value="diff">Compare / Diff</option>
+                <option value="editor">Second File</option>
+              </select>
+              <select id="secFile" class="pane__select" aria-label="Second file" hidden></select>
+              <button class="icon-btn" id="secClose" title="Close split (merge)">✕</button>
+            </div>
+          </div>
+          <div class="pane__body" id="secBody"></div>
+        </section>
+      </div>
+
+      <!-- Drag-to-split drop zones (shown while dragging a tab) -->
+      <div class="dropzones" id="dropzones" hidden aria-hidden="true">
+        <div class="dropzone dropzone--left" data-zone="left"><span>Split Left</span></div>
+        <div class="dropzone dropzone--right" data-zone="right"><span>Split Right</span></div>
+      </div>
+
+      <!-- Status bar -->
+      <footer class="statusbar" role="contentinfo">
+        <div class="statusbar__left">
+          <span id="stLang" class="st-item" title="Language">Plain Text</span>
+          <span id="stTabs" class="st-item" title="Open tabs">0 tabs</span>
+        </div>
+        <div class="statusbar__right">
+          <span id="stPos" class="st-item" title="Cursor position">Ln 1, Col 1</span>
+          <span id="stSel" class="st-item" hidden></span>
+          <span id="stSize" class="st-item" title="File size">0 B</span>
+          <span id="stEol" class="st-item" title="End of line sequence">LF</span>
+          <span id="stIndent" class="st-item" title="Indentation">Spaces: 2</span>
+          <span id="stEnc" class="st-item" title="Encoding">UTF-8</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ===== Command palette ===== -->
+  <div class="overlay" id="paletteOverlay" hidden>
+    <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+      <input type="text" id="paletteInput" placeholder="Type a command…" autocomplete="off" spellcheck="false" />
+      <ul class="palette__list" id="paletteList"></ul>
+    </div>
+  </div>
+
+  <!-- ===== Settings ===== -->
+  <div class="overlay" id="settingsOverlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-label="Settings">
+      <div class="dialog__head">
+        <h2>Settings</h2>
+        <button class="icon-btn" id="settingsClose" title="Close">✕</button>
+      </div>
+      <div class="dialog__body" id="settingsBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== Go to line ===== -->
+  <div class="overlay" id="gotoOverlay" hidden>
+    <div class="palette" role="dialog" aria-modal="true" aria-label="Go to line">
+      <input type="text" id="gotoInput" placeholder="Go to line…" inputmode="numeric" autocomplete="off" />
+    </div>
+  </div>
+
+  <!-- Hidden file input for opening files -->
+  <input type="file" id="fileOpener" multiple hidden accept=".txt,.js,.mjs,.ts,.jsx,.tsx,.html,.htm,.xml,.svg,.css,.scss,.less,.json,.webmanifest,.md,.markdown,.py,.pyw,.ps1,.psm1,.csv,.xlsx,.xls,.log,.yml,.yaml,.sh,.c,.cpp,.java,.go,.rs,.rb,.php,.sql" />
+
+  <!-- Toast notifications -->
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
