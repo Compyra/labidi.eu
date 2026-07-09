@@ -22,21 +22,21 @@
             },
             status: "active",
             progress: 70,
-            url: "https://ghosttooth.lebon.info",
+            url: "https://ghosttooth.labidi.eu",
             tags: ["Web Bluetooth", "Security", "Canvas"]
         },
         {
-            name: "lebon.info",
+            name: "note.labidi.eu",
             desc: {
-                en: "A sprawling hub of tools, pranks and experiments across many subdomains.",
-                fr: "Un vaste centre d'outils, de farces et d'expériences répartis sur de nombreux sous-domaines.",
-                de: "Ein weitläufiges Zentrum voller Tools, Streiche und Experimente über viele Subdomains.",
-                ar: "مركز واسع من الأدوات والمقالب والتجارب عبر نطاقات فرعية عديدة."
+                en: "A self-contained, dependency-free code editor running entirely in the browser.",
+                fr: "Un éditeur de code autonome et sans dépendance, fonctionnant entièrement dans le navigateur.",
+                de: "Ein eigenständiger, abhängigkeitsfreier Code-Editor, der vollständig im Browser läuft.",
+                ar: "محرر أكواد مستقل وبدون تبعيات يعمل بالكامل في المتصفح."
             },
-            status: "active",
-            progress: 55,
-            url: "https://lebon.info",
-            tags: ["Portal", "Tools"]
+            status: "finished",
+            progress: 100,
+            url: "https://note.labidi.eu",
+            tags: ["Editor", "PWA", "Offline"]
         },
         {
             name: "Temporal Portal",
