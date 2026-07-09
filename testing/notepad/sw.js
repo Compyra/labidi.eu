@@ -1,5 +1,5 @@
 /* Note — Service Worker (offline-first caching) */
-const CACHE = "note-v4";
+const CACHE = "note-v5";
 const ASSETS = [
   "./",
   "./index.html",

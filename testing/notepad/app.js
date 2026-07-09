@@ -1367,8 +1367,8 @@
     { id: "file.save", title: "Save File (download)", kb: "Ctrl+S", run: saveFile },
     { id: "file.newFolder", title: "New Folder", run: newFolder },
     { id: "file.rename", title: "Rename Active File", run: () => { const el = dom.tabs.querySelector(".tab.active"); if (el) startInlineRename(el); } },
-    { id: "file.close", title: "Close Active Tab", kb: "Ctrl+W", run: () => closeFocusedTab() },
-    { id: "file.closeOthers", title: "Close Other Tabs", kb: "Ctrl+Shift+W", run: () => state.activeId && closeOtherTabs(state.activeId) },
+    { id: "file.close", title: "Close Active Tab", kb: "Alt+W", run: () => closeFocusedTab() },
+    { id: "file.closeOthers", title: "Close Other Tabs", kb: "Alt+Shift+W", run: () => state.activeId && closeOtherTabs(state.activeId) },
     { id: "file.reopen", title: "Reopen Last Closed Tab", kb: "Ctrl+Shift+T", run: reopenLastClosed },
     { id: "edit.undo", title: "Undo", kb: "Ctrl+Z", run: doUndo },
     { id: "edit.redo", title: "Redo", kb: "Ctrl+Y", run: doRedo },
@@ -2207,7 +2207,7 @@
         { label: "Move Tab Right", disabled: idx >= state.tabs.length - 1, action: () => moveTab(id, 1) },
         { separator: true },
         { label: "Rename", action: () => { const el = dom.tabs.querySelector('.tab[data-id="' + id + '"]'); if (el) startInlineRename(el); } },
-        { label: "Close", kb: "Ctrl+W", action: () => closeTab(id) },
+        { label: "Close", kb: "Alt+W", action: () => closeTab(id) },
         { label: "Close Others", disabled: state.tabs.length < 2, action: () => closeOtherTabs(id) },
       ]);
     });
@@ -2433,8 +2433,10 @@
     if (ctrl && e.key === "g") { e.preventDefault(); openGoto(); return; }
     if (ctrl && e.key === "b") { e.preventDefault(); toggleSidebar(); return; }
     if (ctrl && e.key === ",") { e.preventDefault(); openSettings(); return; }
-    if (ctrl && e.key === "w") { e.preventDefault(); closeFocusedTab(); return; }
-    if (ctrl && e.shiftKey && (e.key === "w" || e.key === "W")) { e.preventDefault(); state.secondary.open ? closeSecondary() : (state.activeId && closeOtherTabs(state.activeId)); return; }
+    // Ctrl+W / Ctrl+Shift+W are reserved by browsers (close tab/window) and cannot be
+    // reliably intercepted, so close actions are bound to Alt+W / Alt+Shift+W.
+    if (e.altKey && !ctrl && e.shiftKey && (e.key === "w" || e.key === "W")) { e.preventDefault(); state.secondary.open ? closeSecondary() : (state.activeId && closeOtherTabs(state.activeId)); return; }
+    if (e.altKey && !ctrl && (e.key === "w" || e.key === "W")) { e.preventDefault(); closeFocusedTab(); return; }
     // Reopen last closed. Ctrl+Shift+T is reserved by some browsers; best-effort +
     // always available via the command palette.
     if (ctrl && e.shiftKey && (e.key === "t" || e.key === "T")) { e.preventDefault(); reopenLastClosed(); return; }
