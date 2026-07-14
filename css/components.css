@@ -186,6 +186,11 @@
     opacity: 1;
 }
 
+/* Clickable card affordance (whole card opens the project) */
+.project-card--clickable {
+    cursor: pointer;
+}
+
 .project-card__head {
     display: flex;
     align-items: flex-start;

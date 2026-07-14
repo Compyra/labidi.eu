@@ -172,6 +172,32 @@
         foot.append(tags, link);
         li.append(foot);
 
+        // Whole-card click opens the project (mirrors the "Visit" link),
+        // while keeping the real anchor for keyboard & assistive tech.
+        if (p.url) {
+            li.classList.add("project-card--clickable");
+
+            const openCard = function (e) {
+                // Let real interactive elements (the link) behave natively.
+                if (e.target.closest("a, button")) return;
+                // Don't hijack an intentional text selection.
+                const sel = window.getSelection && window.getSelection().toString();
+                if (sel) return;
+
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) {
+                    window.open(p.url, "_blank", "noopener");
+                } else {
+                    window.location.href = p.url;
+                }
+            };
+
+            li.addEventListener("click", openCard);
+            // Middle-click (opens in a new tab).
+            li.addEventListener("auxclick", function (e) {
+                if (e.button === 1) openCard(e);
+            });
+        }
+
         return li;
     }
 
