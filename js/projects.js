@@ -54,15 +54,15 @@
         {
             name: "Militaire Alphabet",
             desc: {
-                en: "An interactive trainer for the NATO phonetic alphabet.",
-                fr: "Un entraîneur interactif pour l'alphabet phonétique de l'OTAN.",
-                de: "Ein interaktiver Trainer für das phonetische NATO-Alphabet.",
-                ar: "مدرب تفاعلي للأبجدية الصوتية لحلف الناتو."
+                en: "A page that keeps the computer awake and unlocked while it is open or in focus.",
+                fr: "Une page qui empêche l'ordinateur de se verrouiller tant qu'elle est ouverte ou au premier plan.",
+                de: "Eine Seite, die den Computer wach und entsperrt hält, solange sie geöffnet oder im Fokus ist.",
+                ar: "صفحة تُبقي الحاسوب مستيقظاً وغير مقفل ما دامت مفتوحة أو في التركيز."
             },
             status: "finished",
             progress: 100,
-            url: "https://lebon.info/projects/militaryalphabet/",
-            tags: ["Learning", "UI"]
+            url: "https://rami.party/gallery/militaryalphabet/",
+            tags: ["Wake Lock", "Utility"]
         },
         {
             name: "DNS Sinkhole",
