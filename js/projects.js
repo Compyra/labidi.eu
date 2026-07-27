@@ -52,6 +52,19 @@
             tags: ["HTML", "CSS", "JS"]
         },
         {
+            name: "rami.party",
+            desc: {
+                en: "My personal test area — a sandbox where I spin up new sites, park half-formed ideas and push at the limits of what the web can do.",
+                fr: "Mon terrain d'essai personnel — un bac à sable où je lance de nouveaux sites, gare des idées en germe et explore les limites du web.",
+                de: "Mein persönlicher Testbereich — eine Spielwiese, auf der ich neue Websites starte, halbfertige Ideen ablege und auslote, was im Web möglich ist.",
+                ar: "منطقة الاختبار الشخصية الخاصة بي — مساحة تجريبية أُطلق فيها مواقع جديدة وأضع أفكاراً قيد التشكّل وأستكشف حدود ما يمكن للويب فعله."
+            },
+            status: "active",
+            progress: 50,
+            url: "https://rami.party",
+            tags: ["Sandbox", "Experiments", "Prototypes"]
+        },
+        {
             name: "Militaire Alphabet",
             desc: {
                 en: "A page that keeps the computer awake and unlocked while it is open or in focus.",
@@ -75,7 +88,8 @@
             status: "archived",
             progress: 100,
             url: null,
-            tags: ["Networking", "Privacy"]
+            tags: ["Networking", "Privacy"],
+            hidden: true
         },
         {
             name: "Fake Update",
@@ -88,7 +102,8 @@
             status: "archived",
             progress: 100,
             url: "https://lebon.info/projects/fakeupdate/",
-            tags: ["Prank"]
+            tags: ["Prank"],
+            hidden: true
         }
     ];
 
@@ -207,6 +222,7 @@
         grid.innerHTML = "";
 
         const list = PROJECTS.filter(function (p) {
+            if (p.hidden) return false;
             return filter === "all" || p.status === filter;
         });
 
