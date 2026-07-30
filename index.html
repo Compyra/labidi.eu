@@ -94,6 +94,25 @@
                 <button class="filter" type="button" data-filter="archived" data-i18n="filters.archived">Archived</button>
             </div>
 
+            <div class="project-search">
+                <label class="sr-only" for="project-search-input" data-i18n="search.label">Search projects</label>
+                <div class="project-search__field">
+                    <span class="project-search__icon" aria-hidden="true">&#9906;</span>
+                    <input id="project-search-input" class="project-search__input" type="search"
+                           autocomplete="off" spellcheck="false"
+                           placeholder="Search projects, tags&hellip;"
+                           data-i18n-placeholder="search.placeholder">
+                </div>
+                <p id="project-count" class="project-search__count" aria-live="polite"></p>
+            </div>
+
+            <div class="tagbar">
+                <div id="tag-cloud" class="tag-cloud" role="group"
+                     aria-label="Filter by tag" data-i18n-aria-label="tags.label"></div>
+                <button id="tag-clear" class="tag-chip tag-chip--clear" type="button" hidden
+                        data-i18n="tags.clear">Clear tags</button>
+            </div>
+
             <ul id="project-grid" class="project-grid"></ul>
         </section>
 
@@ -111,6 +130,25 @@
 
     <!-- ===================== FOOTER ===================== -->
     <footer id="contact" class="site-footer" role="contentinfo">
+        <div class="footer-realms">
+            <a class="footer-realm footer-realm--business" href="https://compyra.com"
+               target="_blank" rel="noopener noreferrer">
+                <span class="footer-realm__label" data-i18n="footer.business">Business</span>
+                <span class="footer-realm__name">compyra.com</span>
+            </a>
+
+            <div class="footer-contact">
+                <span class="footer-contact__label" data-i18n="footer.contact">Contact</span>
+                <a class="footer-contact__mail" href="mailto:info@labidi.eu">info@labidi.eu</a>
+            </div>
+
+            <a class="footer-realm footer-realm--fun" href="https://rami.party"
+               target="_blank" rel="noopener noreferrer">
+                <span class="footer-realm__label" data-i18n="footer.fun">Fun</span>
+                <span class="footer-realm__name">rami.party</span>
+            </a>
+        </div>
+
         <p class="site-footer__message" data-i18n="footer.message">
             Safe travels through the vortex.
         </p>

@@ -12,7 +12,12 @@
         motion: "labidi.motion"
     };
 
-    let currentFilter = "all";
+    /* Combined view state for the project grid. */
+    const view = { filter: "all", query: "", tags: [] };
+
+    function renderProjects() {
+        if (window.Projects) window.Projects.render(view.filter, view.query, view.tags);
+    }
 
     function get(key) {
         try { return localStorage.getItem(key); } catch (e) { return null; }
@@ -55,7 +60,7 @@
 
             // Re-render dynamic content whenever language changes
             window.I18N.onChange(function () {
-                if (window.Projects) window.Projects.render(currentFilter);
+                renderProjects();
                 if (select) select.value = window.I18N.lang;
             });
         }
@@ -77,11 +82,82 @@
                 });
                 btn.classList.add("is-active");
                 btn.setAttribute("aria-pressed", "true");
-                currentFilter = btn.dataset.filter;
-                if (window.Projects) window.Projects.render(currentFilter);
+                view.filter = btn.dataset.filter;
+                renderProjects();
             });
             btn.setAttribute("aria-pressed", btn.classList.contains("is-active") ? "true" : "false");
         });
+    }
+
+    /* ---------- Search ---------- */
+    function initSearch() {
+        const input = document.getElementById("project-search-input");
+        if (!input) return;
+
+        input.addEventListener("input", function () {
+            view.query = input.value;
+            renderProjects();
+        });
+
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && input.value) {
+                input.value = "";
+                view.query = "";
+                renderProjects();
+            }
+        });
+    }
+
+    /* ---------- Tag filter ---------- */
+    function syncTagChips() {
+        document.querySelectorAll("#tag-cloud .tag-chip").forEach(function (chip) {
+            const on = view.tags.indexOf(chip.dataset.tag) !== -1;
+            chip.classList.toggle("is-active", on);
+            chip.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+        const clear = document.getElementById("tag-clear");
+        if (clear) clear.hidden = view.tags.length === 0;
+    }
+
+    function toggleTag(name) {
+        if (!name) return;
+        const i = view.tags.indexOf(name);
+        if (i === -1) view.tags.push(name);
+        else view.tags.splice(i, 1);
+        syncTagChips();
+        renderProjects();
+    }
+
+    function initTags() {
+        const cloud = document.getElementById("tag-cloud");
+        if (!cloud || !window.Projects) return;
+
+        window.Projects.tags.forEach(function (name) {
+            const chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = "tag-chip";
+            chip.dataset.tag = name;
+            chip.textContent = name;
+            chip.setAttribute("aria-pressed", "false");
+            cloud.append(chip);
+        });
+
+        cloud.addEventListener("click", function (e) {
+            const chip = e.target.closest(".tag-chip");
+            if (chip) toggleTag(chip.dataset.tag);
+        });
+
+        const clear = document.getElementById("tag-clear");
+        if (clear) {
+            clear.addEventListener("click", function () {
+                view.tags.length = 0;
+                syncTagChips();
+                renderProjects();
+            });
+        }
+
+        // Tags printed on a card toggle the same filter.
+        document.addEventListener("project:tag", function (e) { toggleTag(e.detail); });
     }
 
     /* ---------- Theme toggle ---------- */
@@ -150,7 +226,9 @@
     /* ---------- Boot ---------- */
     function boot() {
         initLanguage();          // sets lang + applies static text
-        if (window.Projects) window.Projects.render(currentFilter);
+        initTags();
+        initSearch();
+        renderProjects();
         initClock();
         initFilters();
         initTheme();

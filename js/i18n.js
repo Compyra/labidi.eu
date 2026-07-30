@@ -23,9 +23,16 @@
             "filters.active": "Active",
             "filters.finished": "Finished",
             "filters.archived": "Archived",
+            "search.label": "Search projects",
+            "search.placeholder": "Search projects, tags\u2026",
+            "tags.label": "Filter by tag",
+            "tags.clear": "Clear tags",
             "about.title": "About this portal",
             "about.text": "A centralized hub for navigation, project management and visitor information — built with pure HTML, CSS and JavaScript. No frameworks, no dependencies, no tracking.",
             "footer.message": "Safe travels through the vortex.",
+            "footer.business": "Business",
+            "footer.contact": "Contact",
+            "footer.fun": "Fun",
             "card.visit": "Visit",
             "card.soon": "Coming soon",
             "card.empty": "No projects in this timeline.",
@@ -49,9 +56,16 @@
             "filters.active": "En cours",
             "filters.finished": "Terminés",
             "filters.archived": "Archivés",
+            "search.label": "Rechercher des projets",
+            "search.placeholder": "Rechercher projets, tags\u2026",
+            "tags.label": "Filtrer par tag",
+            "tags.clear": "Effacer les tags",
             "about.title": "À propos de ce portail",
             "about.text": "Un hub centralisé pour la navigation, la gestion de projets et l'information des visiteurs — construit en HTML, CSS et JavaScript purs. Aucun framework, aucune dépendance, aucun suivi.",
             "footer.message": "Bon voyage à travers le vortex.",
+            "footer.business": "Professionnel",
+            "footer.contact": "Contact",
+            "footer.fun": "Loisirs",
             "card.visit": "Visiter",
             "card.soon": "Bientôt disponible",
             "card.empty": "Aucun projet dans cette chronologie.",
@@ -75,9 +89,16 @@
             "filters.active": "Aktiv",
             "filters.finished": "Fertig",
             "filters.archived": "Archiviert",
+            "search.label": "Projekte suchen",
+            "search.placeholder": "Projekte, Tags suchen\u2026",
+            "tags.label": "Nach Tag filtern",
+            "tags.clear": "Tags zurücksetzen",
             "about.title": "Über dieses Portal",
             "about.text": "Ein zentraler Knotenpunkt für Navigation, Projektverwaltung und Besucherinformationen — gebaut mit reinem HTML, CSS und JavaScript. Keine Frameworks, keine Abhängigkeiten, kein Tracking.",
             "footer.message": "Gute Reise durch den Vortex.",
+            "footer.business": "Geschäftlich",
+            "footer.contact": "Kontakt",
+            "footer.fun": "Spaß",
             "card.visit": "Besuchen",
             "card.soon": "Demnächst",
             "card.empty": "Keine Projekte in dieser Zeitlinie.",
@@ -101,9 +122,16 @@
             "filters.active": "نشط",
             "filters.finished": "مكتمل",
             "filters.archived": "مؤرشف",
+            "search.label": "البحث في المشاريع",
+            "search.placeholder": "ابحث في المشاريع والوسوم\u2026",
+            "tags.label": "التصفية حسب الوسم",
+            "tags.clear": "مسح الوسوم",
             "about.title": "حول هذه البوابة",
             "about.text": "مركز موحد للتنقل وإدارة المشاريع ومعلومات الزوار — مبني بلغة HTML وCSS وJavaScript خالصة. بدون أطر عمل، بدون تبعيات، بدون تتبع.",
             "footer.message": "رحلة آمنة عبر الدوامة.",
+            "footer.business": "أعمال",
+            "footer.contact": "اتصال",
+            "footer.fun": "ترفيه",
             "card.visit": "زيارة",
             "card.soon": "قريباً",
             "card.empty": "لا توجد مشاريع في هذا الجدول الزمني.",
@@ -128,6 +156,12 @@
     function applyStaticText() {
         document.querySelectorAll("[data-i18n]").forEach(function (el) {
             el.textContent = t(el.getAttribute("data-i18n"));
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
+            el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")));
+        });
+        document.querySelectorAll("[data-i18n-aria-label]").forEach(function (el) {
+            el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria-label")));
         });
     }
 

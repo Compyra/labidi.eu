@@ -13,6 +13,19 @@
        url: string or null (null => "coming soon", not clickable) */
     const PROJECTS = [
         {
+            name: "O.A.S.I.S.",
+            desc: {
+                en: "An air-gapped survival and field reference — before/during/after playbooks for every emergency, first aid, navigation, radio and hazard response, with working calculators. Loads once, then never needs the internet again.",
+                fr: "Une référence de survie et de terrain entièrement hors ligne — des guides avant/pendant/après pour chaque urgence, premiers secours, navigation, radio et risques, avec des calculateurs fonctionnels. Se charge une fois, puis n'a plus jamais besoin d'Internet.",
+                de: "Ein netzunabhängiges Überlebens- und Feldhandbuch — Playbooks für vor, während und nach jedem Notfall, Erste Hilfe, Navigation, Funk und Gefahrenabwehr, mit funktionierenden Rechnern. Einmal geladen, danach nie wieder Internet nötig.",
+                ar: "مرجع ميداني للنجاة يعمل دون اتصال بالكامل — أدلة لما قبل الطوارئ وأثنائها وبعدها، مع الإسعافات الأولية والملاحة والاتصال اللاسلكي ومواجهة المخاطر، وحاسبات عملية. يُحمَّل مرة واحدة ثم لا يحتاج إلى الإنترنت أبداً."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://oasis.labidi.eu",
+            tags: ["Survival", "Offline", "Reference"]
+        },
+        {
             name: "GHOSTTOOTH",
             desc: {
                 en: "Real-time Bluetooth surveillance & tracker detector running fully in the browser.",
@@ -23,7 +36,20 @@
             status: "active",
             progress: 70,
             url: "https://ghosttooth.labidi.eu",
-            tags: ["Web Bluetooth", "Security", "Canvas"]
+            tags: ["Bluetooth", "Security"]
+        },
+        {
+            name: "4ck.org",
+            desc: {
+                en: "A story-driven Capture The Flag site — an immersive hacking narrative where every page is a location inside the grid.",
+                fr: "Un site Capture The Flag narratif — une aventure de piratage immersive où chaque page est un lieu à l'intérieur du réseau.",
+                de: "Eine story-getriebene Capture-The-Flag-Seite — ein immersives Hacking-Abenteuer, in dem jede Seite ein Ort innerhalb des Grids ist.",
+                ar: "موقع Capture The Flag قائم على قصة — مغامرة اختراق غامرة حيث تُمثّل كل صفحة موقعاً داخل الشبكة."
+            },
+            status: "active",
+            progress: 30,
+            url: "https://4ck.org",
+            tags: ["CTF", "Storytelling"]
         },
         {
             name: "note.labidi.eu",
@@ -36,7 +62,7 @@
             status: "finished",
             progress: 100,
             url: "https://note.labidi.eu",
-            tags: ["Editor", "PWA", "Offline"]
+            tags: ["Editor", "Offline"]
         },
         {
             name: "Temporal Portal",
@@ -49,7 +75,7 @@
             status: "finished",
             progress: 100,
             url: "https://labidi.eu",
-            tags: ["HTML", "CSS", "JS"]
+            tags: ["Portal", "Multilingual"]
         },
         {
             name: "rami.party",
@@ -62,7 +88,20 @@
             status: "active",
             progress: 50,
             url: "https://rami.party",
-            tags: ["Sandbox", "Experiments", "Prototypes"]
+            tags: ["Experiments", "Prototypes"]
+        },
+        {
+            name: "Huiskeuring.be",
+            desc: {
+                en: "A polished home-inspection service site — Dutch-language, aimed at property inspections in Belgium.",
+                fr: "Un site soigné de service d'inspection immobilière — en néerlandais, dédié aux expertises de biens en Belgique.",
+                de: "Eine ausgefeilte Website für Hausinspektionen — auf Niederländisch, für Immobilienbegutachtungen in Belgien.",
+                ar: "موقع أنيق لخدمة فحص المنازل — باللغة الهولندية، مخصص لفحص العقارات في بلجيكا."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://huiskeuring.be",
+            tags: ["Business", "IRL"]
         },
         {
             name: "Militaire Alphabet",
@@ -101,7 +140,7 @@
             },
             status: "archived",
             progress: 100,
-            url: "https://lebon.info/projects/fakeupdate/",
+            url: "https://rami.party/gallery/prankscreens/windows11/",
             tags: ["Prank"],
             hidden: true
         }
@@ -111,6 +150,45 @@
         if (typeof field === "string") return field;
         const lang = window.I18N ? window.I18N.lang : "en";
         return field[lang] || field.en || Object.values(field)[0] || "";
+    }
+
+    /* Current view state: status filter + free-text query + selected tags. */
+    let state = { filter: "all", query: "", tags: [] };
+
+    function visibleProjects() {
+        return PROJECTS.filter(function (p) { return !p.hidden; });
+    }
+
+    function allTags() {
+        const seen = [];
+        visibleProjects().forEach(function (p) {
+            (p.tags || []).forEach(function (tag) {
+                if (seen.indexOf(tag) === -1) seen.push(tag);
+            });
+        });
+        return seen.sort(function (a, b) { return a.localeCompare(b); });
+    }
+
+    /* A project must match the status filter, every selected tag (AND),
+       and the search query (name / description / tags). */
+    function matches(p) {
+        if (state.filter !== "all" && p.status !== state.filter) return false;
+
+        const hasAllTags = state.tags.every(function (tag) {
+            return (p.tags || []).indexOf(tag) !== -1;
+        });
+        if (!hasAllTags) return false;
+
+        if (state.query) {
+            /* The name is also indexed with punctuation stripped, so "oasis"
+               finds "O.A.S.I.S." and "4ckorg" finds "4ck.org". */
+            const haystack = (
+                p.name + " " + p.name.replace(/[.\-_/\s]/g, "") + " " +
+                localize(p.desc) + " " + (p.tags || []).join(" ")
+            ).toLowerCase();
+            if (haystack.indexOf(state.query) === -1) return false;
+        }
+        return true;
     }
 
     function statusLabel(status) {
@@ -165,9 +243,21 @@
         const tags = document.createElement("div");
         tags.className = "project-card__tags";
         (p.tags || []).forEach(function (tagText) {
-            const tag = document.createElement("span");
+            const tag = document.createElement("button");
+            tag.type = "button";
             tag.className = "tag";
+            tag.dataset.tag = tagText;
             tag.textContent = tagText;
+            tag.setAttribute("aria-pressed",
+                state.tags.indexOf(tagText) !== -1 ? "true" : "false");
+            // Bubbles up to the document, where main.js toggles the filter.
+            tag.addEventListener("click", function (e) {
+                e.preventDefault();
+                tag.dispatchEvent(new CustomEvent("project:tag", {
+                    detail: tagText,
+                    bubbles: true
+                }));
+            });
             tags.append(tag);
         });
 
@@ -216,15 +306,22 @@
         return li;
     }
 
-    function render(filter) {
+    function render(filter, query, tags) {
+        state = {
+            filter: filter || "all",
+            query: (query || "").trim().toLowerCase(),
+            tags: (tags || []).slice()
+        };
+
         const grid = document.getElementById("project-grid");
         if (!grid) return;
         grid.innerHTML = "";
 
-        const list = PROJECTS.filter(function (p) {
-            if (p.hidden) return false;
-            return filter === "all" || p.status === filter;
-        });
+        const pool = visibleProjects();
+        const list = pool.filter(matches);
+
+        const countEl = document.getElementById("project-count");
+        if (countEl) countEl.textContent = list.length + " / " + pool.length;
 
         if (list.length === 0) {
             const empty = document.createElement("li");
@@ -239,6 +336,7 @@
 
     window.Projects = {
         render: render,
-        get all() { return PROJECTS.slice(); }
+        get all() { return PROJECTS.slice(); },
+        get tags() { return allTags(); }
     };
 })();
