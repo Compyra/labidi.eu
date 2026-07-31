@@ -117,17 +117,17 @@
             tags: ["Business", "IRL"]
         },
         {
-            name: "Militaire Alphabet",
+            name: "Phonetic Alphabet Studio",
             desc: {
-                en: "A page that keeps the computer awake and unlocked while it is open or in focus.",
-                fr: "Une page qui empêche l'ordinateur de se verrouiller tant qu'elle est ouverte ou au premier plan.",
-                de: "Eine Seite, die den Computer wach und entsperrt hält, solange sie geöffnet oder im Fokus ist.",
-                ar: "صفحة تُبقي الحاسوب مستيقظاً وغير مقفل ما دامت مفتوحة أو في التركيز."
+                en: "A spelling-alphabet studio — 28 military, civil, world-language and fantasy alphabets, a two-way translator, Morse, practice drills and a screen wake lock. Works offline.",
+                fr: "Un studio d'alphabets d'épellation — 28 alphabets militaires, civils, internationaux et fantastiques, un traducteur bidirectionnel, le morse, des exercices et un verrouillage d'écran. Fonctionne hors ligne.",
+                de: "Ein Studio für Buchstabieralphabete — 28 militärische, zivile, internationale und fantastische Alphabete, ein Übersetzer in beide Richtungen, Morsecode, Übungen und eine Bildschirmsperre. Funktioniert offline.",
+                ar: "استوديو لأبجديات التهجئة — 28 أبجدية عسكرية ومدنية وعالمية وخيالية، مترجم في الاتجاهين، وشيفرة مورس، وتمارين تدريبية، وإبقاء الشاشة مستيقظة. يعمل دون اتصال."
             },
             status: "finished",
             progress: 100,
-            url: "https://rami.party/gallery/militaryalphabet/",
-            tags: ["Wake Lock", "Utility"]
+            url: "https://alphabet.labidi.eu",
+            tags: ["Reference", "Offline", "Wake Lock"]
         },
         {
             name: "DNS Sinkhole",

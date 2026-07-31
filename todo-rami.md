@@ -30,5 +30,9 @@ Outstanding tasks gathered from across the projects.
 - [x] note.labidi.eu code editor finished.
 - [x] Move Markdown Studio out of rami.party/workshop/md/ to md.labidi.eu, now
       trilingual (EN/NL/FR) and listed in `js/projects.js`.
+- [x] Move the Phonetic Alphabet Studio out of rami.party/gallery/militaryalphabet/
+      to alphabet.labidi.eu; old path left as a redirect + tombstone service worker,
+      entry in `js/projects.js` repointed (its description was wrong — it called the
+      tool a wake-lock page).
 - [x] Ghosttooth v2 enchanted grimoire redesign.
 - [x] Consolidate all references to ghosttooth (remove legacy lebon.it / lebon.info).
