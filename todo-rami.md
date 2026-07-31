@@ -28,5 +28,7 @@ Outstanding tasks gathered from across the projects.
 ## Done
 - [x] Move ghosttooth to ghosttooth.labidi.eu.
 - [x] note.labidi.eu code editor finished.
+- [x] Move Markdown Studio out of rami.party/workshop/md/ to md.labidi.eu, now
+      trilingual (EN/NL/FR) and listed in `js/projects.js`.
 - [x] Ghosttooth v2 enchanted grimoire redesign.
 - [x] Consolidate all references to ghosttooth (remove legacy lebon.it / lebon.info).
