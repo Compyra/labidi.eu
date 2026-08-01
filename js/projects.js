@@ -67,10 +67,10 @@
         {
             name: "md.labidi.eu",
             desc: {
-                en: "A split-view Markdown editor with live preview, ten themes and diagrams — fully offline, in English, Dutch and French.",
-                fr: "Un éditeur Markdown en deux volets avec aperçu en direct, dix thèmes et des diagrammes — entièrement hors ligne, en anglais, néerlandais et français.",
-                de: "Ein zweispaltiger Markdown-Editor mit Live-Vorschau, zehn Themes und Diagrammen — vollständig offline, auf Englisch, Niederländisch und Französisch.",
-                ar: "محرر Markdown بعرضين مع معاينة مباشرة وعشرة سمات ومخططات — يعمل بالكامل دون اتصال، بالإنجليزية والهولندية والفرنسية."
+                en: "A split-view Markdown editor with live preview, twelve themes and diagrams — fully offline, in English, Dutch and French.",
+                fr: "Un éditeur Markdown en deux volets avec aperçu en direct, douze thèmes et des diagrammes — entièrement hors ligne, en anglais, néerlandais et français.",
+                de: "Ein zweispaltiger Markdown-Editor mit Live-Vorschau, zwölf Themes und Diagrammen — vollständig offline, auf Englisch, Niederländisch und Französisch.",
+                ar: "محرر Markdown بعرضين مع معاينة مباشرة واثني عشر سمة ومخططات — يعمل بالكامل دون اتصال، بالإنجليزية والهولندية والفرنسية."
             },
             status: "finished",
             progress: 100,
