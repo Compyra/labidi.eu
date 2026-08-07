@@ -26,10 +26,17 @@ Outstanding tasks gathered from across the projects.
 - Keep the projects catalogue up to date (`js/projects.js`).
 
 ## Done
+- [x] Move Mail Ward (the SPF/DKIM/DMARC guide + email header analyzer + volume
+      dashboard) out of rami.party/workshop/mail-ward/ to mail.labidi.eu; old paths
+      (incl. workshop/mailheaders/ and workshop/trace-results/) are redirect stubs —
+      no tombstone service worker needed, it was never a PWA. Listed in `js/projects.js`.
 - [x] Move ghosttooth to ghosttooth.labidi.eu.
 - [x] note.labidi.eu code editor finished.
 - [x] Move Markdown Studio out of rami.party/workshop/md/ to md.labidi.eu, now
       trilingual (EN/NL/FR) and listed in `js/projects.js`.
+- [x] Rebuild the notes/todo app from note.lebon.info as **Daily Board** on
+      todo.labidi.eu — matching the note/md house style, PWA, twelve themes,
+      export/import, all lebon.info branding removed. Listed in `js/projects.js`.
 - [x] Move the Phonetic Alphabet Studio out of rami.party/gallery/militaryalphabet/
       to alphabet.labidi.eu; old path left as a redirect + tombstone service worker,
       entry in `js/projects.js` repointed (its description was wrong — it called the

@@ -78,6 +78,32 @@
             tags: ["Editor", "Offline"]
         },
         {
+            name: "Daily Board",
+            desc: {
+                en: "A private day board — notes, tasks and pasted screenshots in one place, archived and rolled over each morning. Twelve themes, works offline, nothing ever leaves the device.",
+                fr: "Un tableau de bord quotidien et privé — notes, tâches et captures d'écran collées au même endroit, archivées et renouvelées chaque matin. Douze thèmes, fonctionne hors ligne, rien ne quitte l'appareil.",
+                de: "Ein privates Tagesboard — Notizen, Aufgaben und eingefügte Screenshots an einem Ort, jeden Morgen archiviert und neu begonnen. Zwölf Themes, offline nutzbar, nichts verlässt das Gerät.",
+                ar: "لوحة يومية خاصة — ملاحظات ومهام ولقطات شاشة في مكان واحد، تُؤرشف وتُستأنف كل صباح. اثنا عشر سمة، تعمل دون اتصال، ولا شيء يغادر الجهاز."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://todo.labidi.eu",
+            tags: ["Productivity", "Offline"]
+        },
+        {
+            name: "Mail Ward",
+            desc: {
+                en: "Everything about email authentication in one place: a plain-English SPF, DKIM & DMARC guide with a record builder, an email header analyzer and a volume dashboard — all running in the browser.",
+                fr: "Tout sur l'authentification des e-mails au même endroit : un guide SPF, DKIM et DMARC en langage clair avec un générateur d'enregistrements, un analyseur d'en-têtes et un tableau de bord des volumes — le tout dans le navigateur.",
+                de: "Alles über E-Mail-Authentifizierung an einem Ort: ein verständlicher SPF-, DKIM- und DMARC-Leitfaden mit Record-Builder, ein E-Mail-Header-Analyzer und ein Volumen-Dashboard — alles im Browser.",
+                ar: "كل شيء عن مصادقة البريد الإلكتروني في مكان واحد: دليل SPF وDKIM وDMARC بلغة واضحة مع منشئ السجلات، ومحلل ترويسات الرسائل، ولوحة أحجام الإرسال — كله يعمل في المتصفح."
+            },
+            status: "active",
+            progress: 85,
+            url: "https://mail.labidi.eu",
+            tags: ["Email", "Security", "Offline"]
+        },
+        {
             name: "Temporal Portal",
             desc: {
                 en: "This very start page — a dependency-free, multilingual, space-themed launch hub.",
