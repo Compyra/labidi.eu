@@ -14,7 +14,7 @@
        egg: true => clicking never navigates (easter-egg hook) */
     const PROJECTS = [
         {
-            name: "GHOSTTOOTH",
+            name: "GhostTooth",
             desc: {
                 en: "Real-time Bluetooth surveillance & tracker detector running fully in the browser.",
                 fr: "Détecteur de traceurs et de surveillance Bluetooth en temps réel, entièrement dans le navigateur.",
@@ -24,7 +24,7 @@
             status: "active",
             progress: 70,
             url: "https://ghosttooth.labidi.eu",
-            tags: ["Security", "Privacy"]
+            tags: ["Security", "Privacy", "Safety", "Tools"]
         },
         {
             name: "O.A.S.I.S.",
@@ -37,7 +37,7 @@
             status: "finished",
             progress: 100,
             url: "https://oasis.labidi.eu",
-            tags: ["Offline", "Survival", "Safety"]
+            tags: ["Offline", "Survival", "Safety", "Learning"]
         },
         {
             name: "Oasis Online",
@@ -49,7 +49,7 @@
             },
             status: "active",
             progress: 80,
-            url: "https://oasis-online.labidi.eu",
+            url: "https://help.labidi.eu",
             tags: ["Help", "Safety"]
         },
         {
@@ -63,7 +63,7 @@
             status: "active",
             progress: 75,
             url: "https://breach.labidi.eu",
-            tags: ["Security", "Help"]
+            tags: ["Security", "Help", "Safety", "Learning"]
         },
         {
             name: "Mail Ward",
@@ -76,7 +76,7 @@
             status: "active",
             progress: 85,
             url: "https://mail.labidi.eu",
-            tags: ["Email", "Security"]
+            tags: ["Security", "Safety", "Learning", "Tools"]
         },
         {
             name: "PDF Studio",
@@ -89,7 +89,7 @@
             status: "finished",
             progress: 100,
             url: "https://pdf.labidi.eu",
-            tags: ["PDF", "Tools", "Offline"]
+            tags: ["Tools", "Editor", "Offline"]
         },
         {
             name: "Markdown Studio",
@@ -102,7 +102,7 @@
             status: "finished",
             progress: 100,
             url: "https://md.labidi.eu",
-            tags: ["Markdown", "Editor"]
+            tags: ["Editor"]
         },
         {
             name: "Note",
@@ -115,7 +115,7 @@
             status: "finished",
             progress: 100,
             url: "https://note.labidi.eu",
-            tags: ["Editor", "Offline"]
+            tags: ["Editor", "Offline", "Tools"]
         },
         {
             name: "Todo",
@@ -128,7 +128,20 @@
             status: "finished",
             progress: 100,
             url: "https://todo.labidi.eu",
-            tags: ["Notes", "Tasks"]
+            tags: ["Tasks", "Editor", "Tools"]
+        },
+        {
+            name: "Huiskeuring",
+            desc: {
+                en: "A free house inspection checklist for visiting and evaluating homes in Belgium.",
+                fr: "Une liste de contrôle gratuite pour visiter et évaluer des maisons en Belgique.",
+                de: "Eine kostenlose Checkliste zur Besichtigung und Bewertung von Häusern in Belgien.",
+                ar: "قائمة فحص مجانية لزيارة وتقييم المنازل في بلجيكا."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://huiskeuring.be",
+            tags: ["Tools", "Tasks"]
         },
         {
             name: "BeeFirst",
@@ -141,7 +154,7 @@
             status: "active",
             progress: 90,
             url: "https://beefirst.labidi.eu",
-            tags: ["Game", "Tools"]
+            tags: ["Fun", "Tools"]
         },
         {
             name: "Alphabet Studio",
@@ -168,7 +181,7 @@
             progress: 100,
             url: "https://labidi.eu",
             egg: true,
-            tags: ["Portal"]
+            tags: ["Fun"]
         },
         {
             name: "Fake Update",
@@ -181,7 +194,7 @@
             status: "soon",
             progress: 100,
             url: null,
-            tags: ["Prank"]
+            tags: ["Fun"]
         },
         {
             name: "The People Library",
@@ -207,7 +220,7 @@
             status: "soon",
             progress: 100,
             url: null,
-            tags: ["Privacy", "Security"]
+            tags: ["Privacy", "Security", "Learning"]
         }
     ];
 

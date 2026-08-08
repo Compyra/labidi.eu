@@ -18,6 +18,10 @@
     border-bottom: 1px solid var(--border);
 }
 
+:root[data-theme="light"] .site-header {
+    background: linear-gradient(180deg, rgba(219, 231, 255, 0.85), rgba(219, 231, 255, 0.25));
+}
+
 .main-nav {
     margin-inline-start: auto;
 }

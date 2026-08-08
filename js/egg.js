@@ -32,28 +32,38 @@
              window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
 
-    /* ---- 1) Hyperjump: starfield streaks + clock time travel ---- */
+    /* ---- 1) Hyperjump: slow spin-up, starfield streaks, clock time travel ---- */
     function hyperjump(card) {
-        card.classList.add("is-warping");
-        setTimeout(function () { card.classList.remove("is-warping"); }, 600);
+        const DUR = 3400;
 
         if (window.SpaceBG && typeof window.SpaceBG.warp === "function") {
-            window.SpaceBG.warp(1500);
+            window.SpaceBG.warp(DUR);
         }
+
+        // Wobble the card right when the jump hits full speed
+        setTimeout(function () {
+            card.classList.add("is-warping");
+            setTimeout(function () { card.classList.remove("is-warping"); }, 600);
+        }, DUR * 0.5);
 
         const clock = document.getElementById("clock");
         if (clock) {
             const from = Date.UTC(1905, 0, 1);
             const to = Date.UTC(2205, 0, 1);
-            const scramble = setInterval(function () {
+            const start = performance.now();
+            (function scramble() {
+                const t = (performance.now() - start) / DUR;
+                if (t >= 0.92) {
+                    clock.textContent = formatClock(new Date());
+                    return;
+                }
                 clock.textContent = formatClock(new Date(from + Math.random() * (to - from)));
-            }, 70);
-            setTimeout(function () {
-                clearInterval(scramble);
-                clock.textContent = formatClock(new Date());
-            }, 1500);
+                // Dates flip slowly at first, then race at full warp
+                const delay = 340 - 300 * Math.min(1, t / 0.55);
+                setTimeout(scramble, delay);
+            })();
         }
-        return 1700;
+        return DUR + 200;
     }
 
     /* ---- 2) UFO abducts the card's arrow and gives it back ---- */

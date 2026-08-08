@@ -25,7 +25,19 @@
 
     let rafId = null;
     let running = false;
-    let warpUntil = 0;
+    let warpStart = 0;
+    let warpDur = 0;
+
+    /* Cinematic hyperjump envelope: slow buildup, full warp, quick settle */
+    function warpIntensity(now) {
+        if (!warpDur) return 0;
+        const t = (now - warpStart) / warpDur;
+        if (t <= 0) return 0;
+        if (t >= 1) { warpDur = 0; return 0; }
+        if (t < 0.55) { const p = t / 0.55; return p * p * p; }
+        if (t < 0.85) return 1;
+        return 1 - (t - 0.85) / 0.15;
+    }
 
     const COLORS = ["#4fd6ff", "#2b8bff", "#8a6bff", "#ffffff"];
 
@@ -145,7 +157,7 @@
         });
 
         // Stars
-        const warping = time < warpUntil;
+        const warp = warpIntensity(time);
         const wcx = width / 2;
         const wcy = height / 2;
         for (let i = 0; i < stars.length; i++) {
@@ -153,14 +165,26 @@
             const tw = 0.5 + 0.5 * Math.sin(time * 0.002 + s.twk);
             const ox = -pointer.x * 12 * s.depth;
             const oy = -pointer.y * 12 * s.depth;
-            if (warping) {
-                // Hyperjump: streak stars outward from the center
-                const k = 0.16 * s.depth;
+            if (warp > 0.01) {
+                // Streak stars outward from the center, longer as warp grows
+                const k = (0.03 + 0.5 * warp) * s.depth;
+                const x1 = s.x + ox;
+                const y1 = s.y + oy;
+                const x2 = x1 + (s.x - wcx) * k;
+                const y2 = y1 + (s.y - wcy) * k;
+                // Glow pass
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba(79, 214, 255," + (0.3 * warp) + ")";
+                ctx.lineWidth = s.r * 2.6;
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                // Core pass
                 ctx.beginPath();
                 ctx.strokeStyle = "rgba(234, 242, 255," + (0.35 + tw * 0.5) + ")";
                 ctx.lineWidth = s.r;
-                ctx.moveTo(s.x + ox, s.y + oy);
-                ctx.lineTo(s.x + ox + (s.x - wcx) * k, s.y + oy + (s.y - wcy) * k);
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
                 ctx.stroke();
             } else {
                 ctx.beginPath();
@@ -307,7 +331,9 @@
     window.SpaceBG = {
         refresh: function () { stop(); start(); },
         warp: function (ms) {
-            if (running) warpUntil = performance.now() + (ms || 1000);
+            if (!running) return;
+            warpStart = performance.now();
+            warpDur = ms || 1000;
         }
     };
 
