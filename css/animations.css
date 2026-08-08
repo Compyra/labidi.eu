@@ -1,5 +1,5 @@
 /* ============================================================
-   animations.css — Keyframes, entrance transitions, motion prefs
+   animations.css - Keyframes, entrance transitions, motion prefs
    ============================================================ */
 
 @keyframes float-in {
@@ -65,4 +65,206 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+}
+
+/* SOS button heartbeat */
+@keyframes sos-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.5); }
+    50%      { box-shadow: 0 0 0 9px rgba(229, 72, 77, 0); }
+}
+
+.control--sos {
+    animation: sos-pulse 2.4s ease-out infinite;
+}
+
+/* Temporal Portal easter-egg: quick warp wobble (effect 1) */
+@keyframes portal-warp {
+    0%   { transform: scale(1) rotate(0deg); }
+    30%  { transform: scale(0.97) rotate(-1.2deg); }
+    65%  { transform: scale(1.02) rotate(1.1deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.project-card.is-warping {
+    animation: portal-warp 480ms var(--ease);
+}
+
+/* ---------- Temporal Portal easter-egg effects ---------- */
+
+@keyframes egg-fade-in {
+    from { opacity: 0; }
+}
+
+@keyframes egg-fade-out {
+    to { opacity: 0; }
+}
+
+/* 2) UFO abduction */
+.egg-ufo {
+    position: absolute;
+    z-index: 3;
+    left: -60px;
+    top: var(--ufo-y, 70%);
+    margin-top: -34px;
+    font-size: 1.7rem;
+    line-height: 1;
+    pointer-events: none;
+    animation: egg-ufo-fly 2.6s ease-in-out forwards;
+}
+
+.egg-ufo::after {
+    content: "";
+    position: absolute;
+    top: 88%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 30px solid rgba(79, 214, 255, 0.35);
+    opacity: 0;
+    animation: egg-ufo-beam 2.6s linear forwards;
+}
+
+@keyframes egg-ufo-fly {
+    0%       { left: -60px; opacity: 0; }
+    12%      { opacity: 1; }
+    38%, 68% { left: calc(var(--ufo-x, 80%) - 14px); }
+    100%     { left: calc(100% + 40px); opacity: 0.75; }
+}
+
+@keyframes egg-ufo-beam {
+    0%, 36%   { opacity: 0; }
+    46%, 62%  { opacity: 1; }
+    72%, 100% { opacity: 0; }
+}
+
+.project-card__link .arrow.egg-abducted {
+    animation: egg-arrow-up 480ms var(--ease) forwards;
+}
+
+.project-card__link .arrow.egg-returned {
+    animation: egg-arrow-down 400ms var(--ease);
+}
+
+@keyframes egg-arrow-up {
+    to { transform: translateY(-30px) rotate(25deg) scale(0.4); opacity: 0; }
+}
+
+@keyframes egg-arrow-down {
+    from { transform: translateY(-30px) scale(0.4); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* 3) Temporal passport stamp */
+.egg-stamp {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    padding: var(--sp-4);
+    border-radius: inherit;
+    background: var(--surface-strong);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: egg-fade-in 280ms var(--ease);
+}
+
+.egg-stamp.is-leaving {
+    animation: egg-fade-out 380ms var(--ease) forwards;
+}
+
+.egg-stamp__seal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    text-align: center;
+    padding: var(--sp-3) var(--sp-4);
+    border: 3px double var(--glow-gold);
+    border-radius: var(--radius-sm);
+    color: var(--glow-gold);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    transform: rotate(-7deg);
+    animation: egg-stamp-thump 420ms var(--ease);
+}
+
+.egg-stamp__date {
+    font-weight: 400;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+}
+
+@keyframes egg-stamp-thump {
+    0%   { transform: rotate(-7deg) scale(2.4); opacity: 0; }
+    55%  { transform: rotate(-7deg) scale(0.92); opacity: 1; }
+    100% { transform: rotate(-7deg) scale(1); }
+}
+
+/* 4) Wormhole greeting */
+.egg-vortex {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 3;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    animation: egg-fade-in 300ms var(--ease);
+}
+
+.egg-vortex::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg,
+        var(--glow-cyan), var(--glow-purple), var(--space-700),
+        var(--glow-blue), var(--glow-cyan));
+    filter: blur(6px);
+    opacity: 0.85;
+    animation: egg-vortex-spin 1.1s linear infinite;
+}
+
+.egg-vortex::after {
+    content: "";
+    position: absolute;
+    inset: 22%;
+    border-radius: 50%;
+    background: var(--space-900);
+    opacity: 0.9;
+}
+
+.egg-vortex.is-leaving {
+    animation: egg-fade-out 400ms var(--ease) forwards;
+}
+
+@keyframes egg-vortex-spin {
+    to { transform: rotate(360deg); }
+}
+
+.egg-vortex__greeting {
+    position: relative;
+    z-index: 1;
+    max-width: 130px;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-shadow: 0 0 12px var(--space-900);
+}
+
+.egg-vortex__greeting.is-spiraling {
+    animation: egg-greeting-spiral 760ms var(--ease);
+}
+
+@keyframes egg-greeting-spiral {
+    0%   { transform: rotate(-200deg) scale(0); opacity: 0; }
+    60%  { transform: rotate(8deg) scale(1.05); opacity: 1; }
+    100% { transform: rotate(0deg) scale(1); }
 }

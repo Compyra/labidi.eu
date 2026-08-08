@@ -1,5 +1,5 @@
 /* ============================================================
-   projects.js — Project data + rendering.
+   projects.js - Project data + rendering.
    Edit the PROJECTS array to manage the catalogue.
    Each project's `name`/`desc` may be a string or a map of
    language codes for translated content.
@@ -8,23 +8,11 @@
 (function () {
     "use strict";
 
-    /* status: "active" | "finished" | "archived"
+    /* status: "active" | "finished" | "soon"
        progress: 0-100 (used for active projects)
-       url: string or null (null => "coming soon", not clickable) */
+       url: string or null (null => "coming soon", not clickable)
+       egg: true => clicking never navigates (easter-egg hook) */
     const PROJECTS = [
-        {
-            name: "O.A.S.I.S.",
-            desc: {
-                en: "An air-gapped survival and field reference — before/during/after playbooks for every emergency, first aid, navigation, radio and hazard response, with working calculators. Loads once, then never needs the internet again.",
-                fr: "Une référence de survie et de terrain entièrement hors ligne — des guides avant/pendant/après pour chaque urgence, premiers secours, navigation, radio et risques, avec des calculateurs fonctionnels. Se charge une fois, puis n'a plus jamais besoin d'Internet.",
-                de: "Ein netzunabhängiges Überlebens- und Feldhandbuch — Playbooks für vor, während und nach jedem Notfall, Erste Hilfe, Navigation, Funk und Gefahrenabwehr, mit funktionierenden Rechnern. Einmal geladen, danach nie wieder Internet nötig.",
-                ar: "مرجع ميداني للنجاة يعمل دون اتصال بالكامل — أدلة لما قبل الطوارئ وأثنائها وبعدها، مع الإسعافات الأولية والملاحة والاتصال اللاسلكي ومواجهة المخاطر، وحاسبات عملية. يُحمَّل مرة واحدة ثم لا يحتاج إلى الإنترنت أبداً."
-            },
-            status: "finished",
-            progress: 100,
-            url: "https://oasis.labidi.eu",
-            tags: ["Survival", "Offline", "Reference"]
-        },
         {
             name: "GHOSTTOOTH",
             desc: {
@@ -36,23 +24,88 @@
             status: "active",
             progress: 70,
             url: "https://ghosttooth.labidi.eu",
-            tags: ["Bluetooth", "Security"]
+            tags: ["Security", "Privacy"]
         },
         {
-            name: "4ck.org",
+            name: "O.A.S.I.S.",
             desc: {
-                en: "A story-driven Capture The Flag site — an immersive hacking narrative where every page is a location inside the grid.",
-                fr: "Un site Capture The Flag narratif — une aventure de piratage immersive où chaque page est un lieu à l'intérieur du réseau.",
-                de: "Eine story-getriebene Capture-The-Flag-Seite — ein immersives Hacking-Abenteuer, in dem jede Seite ein Ort innerhalb des Grids ist.",
-                ar: "موقع Capture The Flag قائم على قصة — مغامرة اختراق غامرة حيث تُمثّل كل صفحة موقعاً داخل الشبكة."
+                en: "Offline Advanced System for Information and Survival: a knowledge base that works with no connection at all.",
+                fr: "Système avancé hors ligne d'information et de survie : une base de connaissances qui fonctionne sans aucune connexion.",
+                de: "Offline-Wissensbasis für Information und Überleben, funktioniert ganz ohne Verbindung.",
+                ar: "نظام متقدم للمعلومات والبقاء يعمل دون أي اتصال."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://oasis.labidi.eu",
+            tags: ["Offline", "Survival", "Safety"]
+        },
+        {
+            name: "Oasis Online",
+            desc: {
+                en: "Official emergency numbers and helplines worldwide. Verified numbers only, free and anonymous.",
+                fr: "Numéros d'urgence et lignes d'écoute officiels dans le monde entier. Vérifiés, gratuits et anonymes.",
+                de: "Offizielle Notrufnummern und Hilfetelefone weltweit. Nur geprüfte Nummern, kostenlos und anonym.",
+                ar: "أرقام طوارئ وخطوط مساعدة رسمية حول العالم. أرقام موثوقة فقط، مجانية ومجهولة."
             },
             status: "active",
-            progress: 30,
-            url: "https://4ck.org",
-            tags: ["CTF", "Storytelling"]
+            progress: 80,
+            url: "https://oasis-online.labidi.eu",
+            tags: ["Help", "Safety"]
         },
         {
-            name: "note.labidi.eu",
+            name: "Breachlight",
+            desc: {
+                en: "What to do the moment after you clicked: calm, step-by-step first aid for phishing and other online incidents.",
+                fr: "Quoi faire juste après avoir cliqué : des premiers secours pas à pas pour le phishing et autres incidents en ligne.",
+                de: "Was direkt nach dem Klick zu tun ist: ruhige Schritt-für-Schritt-Hilfe bei Phishing und anderen Online-Vorfällen.",
+                ar: "ماذا تفعل فور النقر: إسعافات أولية خطوة بخطوة للتصيد وحوادث الإنترنت الأخرى."
+            },
+            status: "active",
+            progress: 75,
+            url: "https://breach.labidi.eu",
+            tags: ["Security", "Help"]
+        },
+        {
+            name: "Mail Ward",
+            desc: {
+                en: "SPF, DKIM and DMARC explained in plain language, with a record builder, inspector and rollout plan.",
+                fr: "SPF, DKIM et DMARC expliqués simplement, avec un générateur d'enregistrements, un inspecteur et un plan de déploiement.",
+                de: "SPF, DKIM und DMARC verständlich erklärt, mit Record-Builder, Inspektor und Einführungsplan.",
+                ar: "شرح مبسط لـ SPF وDKIM وDMARC، مع أداة إنشاء السجلات وفاحص وخطة تطبيق."
+            },
+            status: "active",
+            progress: 85,
+            url: "https://mail.labidi.eu",
+            tags: ["Email", "Security"]
+        },
+        {
+            name: "PDF Studio",
+            desc: {
+                en: "A PDF toolbox running entirely in the browser: merge, split, edit and more. Files never leave the device.",
+                fr: "Une boîte à outils PDF entièrement dans le navigateur : fusionner, diviser, modifier et plus. Les fichiers ne quittent jamais l'appareil.",
+                de: "Ein PDF-Werkzeugkasten komplett im Browser: zusammenführen, teilen, bearbeiten und mehr. Dateien verlassen nie das Gerät.",
+                ar: "صندوق أدوات PDF يعمل بالكامل في المتصفح: دمج وتقسيم وتحرير والمزيد. الملفات لا تغادر الجهاز أبداً."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://pdf.labidi.eu",
+            tags: ["PDF", "Tools", "Offline"]
+        },
+        {
+            name: "Markdown Studio",
+            desc: {
+                en: "A split-view Markdown editor with live preview, twelve themes and zero network calls.",
+                fr: "Un éditeur Markdown en vue partagée avec aperçu en direct, douze thèmes et aucun appel réseau.",
+                de: "Ein Markdown-Editor mit geteilter Ansicht, Live-Vorschau, zwölf Themes und null Netzwerkzugriffen.",
+                ar: "محرر ماركداون بعرض مقسوم مع معاينة مباشرة واثنتي عشرة سمة وبدون أي اتصالات شبكة."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://md.labidi.eu",
+            tags: ["Markdown", "Editor"]
+        },
+        {
+            name: "Note",
             desc: {
                 en: "A self-contained, dependency-free code editor running entirely in the browser.",
                 fr: "Un éditeur de code autonome et sans dépendance, fonctionnant entièrement dans le navigateur.",
@@ -65,109 +118,57 @@
             tags: ["Editor", "Offline"]
         },
         {
-            name: "md.labidi.eu",
+            name: "Todo",
             desc: {
-                en: "A split-view Markdown editor with live preview, twelve themes and diagrams — fully offline, in English, Dutch and French.",
-                fr: "Un éditeur Markdown en deux volets avec aperçu en direct, douze thèmes et des diagrammes — entièrement hors ligne, en anglais, néerlandais et français.",
-                de: "Ein zweispaltiger Markdown-Editor mit Live-Vorschau, zwölf Themes und Diagrammen — vollständig offline, auf Englisch, Niederländisch und Französisch.",
-                ar: "محرر Markdown بعرضين مع معاينة مباشرة واثني عشر سمة ومخططات — يعمل بالكامل دون اتصال، بالإنجليزية والهولندية والفرنسية."
-            },
-            status: "finished",
-            progress: 100,
-            url: "https://md.labidi.eu",
-            tags: ["Editor", "Offline"]
-        },
-        {
-            name: "Daily Board",
-            desc: {
-                en: "A private day board — notes, tasks and pasted screenshots in one place, archived and rolled over each morning. Twelve themes, works offline, nothing ever leaves the device.",
-                fr: "Un tableau de bord quotidien et privé — notes, tâches et captures d'écran collées au même endroit, archivées et renouvelées chaque matin. Douze thèmes, fonctionne hors ligne, rien ne quitte l'appareil.",
-                de: "Ein privates Tagesboard — Notizen, Aufgaben und eingefügte Screenshots an einem Ort, jeden Morgen archiviert und neu begonnen. Zwölf Themes, offline nutzbar, nichts verlässt das Gerät.",
-                ar: "لوحة يومية خاصة — ملاحظات ومهام ولقطات شاشة في مكان واحد، تُؤرشف وتُستأنف كل صباح. اثنا عشر سمة، تعمل دون اتصال، ولا شيء يغادر الجهاز."
+                en: "A daily board for quick notes and tasks that lives entirely in the browser.",
+                fr: "Un tableau quotidien pour notes rapides et tâches, directement dans le navigateur.",
+                de: "Ein tägliches Board für schnelle Notizen und Aufgaben, direkt im Browser.",
+                ar: "لوحة يومية للملاحظات السريعة والمهام تعمل في المتصفح."
             },
             status: "finished",
             progress: 100,
             url: "https://todo.labidi.eu",
-            tags: ["Productivity", "Offline"]
+            tags: ["Notes", "Tasks"]
         },
         {
-            name: "Mail Ward",
+            name: "BeeFirst",
             desc: {
-                en: "Everything about email authentication in one place: a plain-English SPF, DKIM & DMARC guide with a record builder, an email header analyzer and a volume dashboard — all running in the browser.",
-                fr: "Tout sur l'authentification des e-mails au même endroit : un guide SPF, DKIM et DMARC en langage clair avec un générateur d'enregistrements, un analyseur d'en-têtes et un tableau de bord des volumes — le tout dans le navigateur.",
-                de: "Alles über E-Mail-Authentifizierung an einem Ort: ein verständlicher SPF-, DKIM- und DMARC-Leitfaden mit Record-Builder, ein E-Mail-Header-Analyzer und ein Volumen-Dashboard — alles im Browser.",
-                ar: "كل شيء عن مصادقة البريد الإلكتروني في مكان واحد: دليل SPF وDKIM وDMARC بلغة واضحة مع منشئ السجلات، ومحلل ترويسات الرسائل، ولوحة أحجام الإرسال — كله يعمل في المتصفح."
+                en: "Everyone lands a finger on the screen and the hive picks who goes first: a fair first-player and team picker.",
+                fr: "Chacun pose un doigt sur l'écran et la ruche choisit qui commence : un tirage équitable du premier joueur et des équipes.",
+                de: "Alle legen einen Finger auf den Bildschirm und der Schwarm wählt, wer anfängt: faire Auswahl von Startspieler und Teams.",
+                ar: "يضع الجميع إصبعاً على الشاشة وتختار الخلية من يبدأ: اختيار عادل لأول لاعب وللفرق."
             },
             status: "active",
-            progress: 85,
-            url: "https://mail.labidi.eu",
-            tags: ["Email", "Security", "Offline"]
+            progress: 90,
+            url: "https://beefirst.labidi.eu",
+            tags: ["Game", "Tools"]
         },
         {
-            name: "Temporal Portal",
+            name: "Alphabet Studio",
             desc: {
-                en: "This very start page — a dependency-free, multilingual, space-themed launch hub.",
-                fr: "Cette page d'accueil — un hub de lancement multilingue sur le thème de l'espace, sans dépendance.",
-                de: "Diese Startseite — ein abhängigkeitsfreier, mehrsprachiger, weltraumthematischer Start-Hub.",
-                ar: "هذه الصفحة الرئيسية — مركز إطلاق متعدد اللغات بطابع فضائي وبدون تبعيات."
-            },
-            status: "finished",
-            progress: 100,
-            url: "https://labidi.eu",
-            tags: ["Portal", "Multilingual"]
-        },
-        {
-            name: "rami.party",
-            desc: {
-                en: "My personal test area — a sandbox where I spin up new sites, park half-formed ideas and push at the limits of what the web can do.",
-                fr: "Mon terrain d'essai personnel — un bac à sable où je lance de nouveaux sites, gare des idées en germe et explore les limites du web.",
-                de: "Mein persönlicher Testbereich — eine Spielwiese, auf der ich neue Websites starte, halbfertige Ideen ablege und auslote, was im Web möglich ist.",
-                ar: "منطقة الاختبار الشخصية الخاصة بي — مساحة تجريبية أُطلق فيها مواقع جديدة وأضع أفكاراً قيد التشكّل وأستكشف حدود ما يمكن للويب فعله."
-            },
-            status: "active",
-            progress: 50,
-            url: "https://rami.party",
-            tags: ["Experiments", "Prototypes"]
-        },
-        {
-            name: "Huiskeuring.be",
-            desc: {
-                en: "A polished home-inspection service site — Dutch-language, aimed at property inspections in Belgium.",
-                fr: "Un site soigné de service d'inspection immobilière — en néerlandais, dédié aux expertises de biens en Belgique.",
-                de: "Eine ausgefeilte Website für Hausinspektionen — auf Niederländisch, für Immobilienbegutachtungen in Belgien.",
-                ar: "موقع أنيق لخدمة فحص المنازل — باللغة الهولندية، مخصص لفحص العقارات في بلجيكا."
-            },
-            status: "finished",
-            progress: 100,
-            url: "https://huiskeuring.be",
-            tags: ["Business", "IRL"]
-        },
-        {
-            name: "Phonetic Alphabet Studio",
-            desc: {
-                en: "A spelling-alphabet studio — 28 military, civil, world-language and fantasy alphabets, a two-way translator, Morse, practice drills and a screen wake lock. Works offline.",
-                fr: "Un studio d'alphabets d'épellation — 28 alphabets militaires, civils, internationaux et fantastiques, un traducteur bidirectionnel, le morse, des exercices et un verrouillage d'écran. Fonctionne hors ligne.",
-                de: "Ein Studio für Buchstabieralphabete — 28 militärische, zivile, internationale und fantastische Alphabete, ein Übersetzer in beide Richtungen, Morsecode, Übungen und eine Bildschirmsperre. Funktioniert offline.",
-                ar: "استوديو لأبجديات التهجئة — 28 أبجدية عسكرية ومدنية وعالمية وخيالية، مترجم في الاتجاهين، وشيفرة مورس، وتمارين تدريبية، وإبقاء الشاشة مستيقظة. يعمل دون اتصال."
+                en: "Phonetic alphabet studio covering military, world and fantasy spelling codes.",
+                fr: "Studio d'alphabets phonétiques : codes d'épellation militaires, du monde et fantastiques.",
+                de: "Studio für phonetische Alphabete: militärische, internationale und Fantasy-Buchstabiercodes.",
+                ar: "استوديو الأبجديات الصوتية: رموز تهجئة عسكرية وعالمية وخيالية."
             },
             status: "finished",
             progress: 100,
             url: "https://alphabet.labidi.eu",
-            tags: ["Reference", "Offline", "Wake Lock"]
+            tags: ["Learning"]
         },
         {
-            name: "DNS Sinkhole",
+            name: "Temporal Portal",
             desc: {
-                en: "Notes and tooling around a self-hosted DNS-based ad & tracker blocker.",
-                fr: "Notes et outils autour d'un bloqueur de publicités et de traceurs auto-hébergé basé sur DNS.",
-                de: "Notizen und Werkzeuge rund um einen selbst gehosteten DNS-basierten Werbe- und Tracker-Blocker.",
-                ar: "ملاحظات وأدوات حول حاجب إعلانات وتتبع قائم على DNS مستضاف ذاتياً."
+                en: "This very start page: a dependency-free, multilingual, space-themed launch hub.",
+                fr: "Cette page d'accueil : un hub de lancement multilingue sur le thème de l'espace, sans dépendance.",
+                de: "Diese Startseite: ein abhängigkeitsfreier, mehrsprachiger Start-Hub im Weltraum-Stil.",
+                ar: "هذه الصفحة الرئيسية: مركز إطلاق متعدد اللغات بطابع فضائي وبدون تبعيات."
             },
-            status: "archived",
+            status: "finished",
             progress: 100,
-            url: null,
-            tags: ["Networking", "Privacy"],
-            hidden: true
+            url: "https://labidi.eu",
+            egg: true,
+            tags: ["Portal"]
         },
         {
             name: "Fake Update",
@@ -177,11 +178,36 @@
                 de: "Ein Vollbild-Streich, der ein endloses Betriebssystem-Update simuliert.",
                 ar: "مقلب بملء الشاشة يحاكي تحديث نظام تشغيل لا ينتهي."
             },
-            status: "archived",
+            status: "soon",
             progress: 100,
-            url: "https://rami.party/gallery/prankscreens/windows11/",
-            tags: ["Prank"],
-            hidden: true
+            url: null,
+            tags: ["Prank"]
+        },
+        {
+            name: "The People Library",
+            desc: {
+                en: "A library of interactive workshops on personality, behaviour and communication.",
+                fr: "Une bibliothèque d'ateliers interactifs sur la personnalité, le comportement et la communication.",
+                de: "Eine Bibliothek interaktiver Workshops zu Persönlichkeit, Verhalten und Kommunikation.",
+                ar: "مكتبة ورش تفاعلية حول الشخصية والسلوك والتواصل."
+            },
+            status: "soon",
+            progress: 100,
+            url: null,
+            tags: ["Psychology", "Learning"]
+        },
+        {
+            name: "DNS Sinkhole",
+            desc: {
+                en: "Notes and tooling around a self-hosted DNS-based ad & tracker blocker.",
+                fr: "Notes et outils autour d'un bloqueur de publicités et de traceurs auto-hébergé basé sur DNS.",
+                de: "Notizen und Werkzeuge rund um einen selbst gehosteten DNS-basierten Werbe- und Tracker-Blocker.",
+                ar: "ملاحظات وأدوات حول حاجب إعلانات وتتبع قائم على DNS مستضاف ذاتياً."
+            },
+            status: "soon",
+            progress: 100,
+            url: null,
+            tags: ["Privacy", "Security"]
         }
     ];
 
@@ -191,43 +217,13 @@
         return field[lang] || field.en || Object.values(field)[0] || "";
     }
 
-    /* Current view state: status filter + free-text query + selected tags. */
-    let state = { filter: "all", query: "", tags: [] };
-
-    function visibleProjects() {
-        return PROJECTS.filter(function (p) { return !p.hidden; });
-    }
-
-    function allTags() {
-        const seen = [];
-        visibleProjects().forEach(function (p) {
-            (p.tags || []).forEach(function (tag) {
-                if (seen.indexOf(tag) === -1) seen.push(tag);
-            });
-        });
-        return seen.sort(function (a, b) { return a.localeCompare(b); });
-    }
-
-    /* A project must match the status filter, every selected tag (AND),
-       and the search query (name / description / tags). */
-    function matches(p) {
-        if (state.filter !== "all" && p.status !== state.filter) return false;
-
-        const hasAllTags = state.tags.every(function (tag) {
-            return (p.tags || []).indexOf(tag) !== -1;
-        });
-        if (!hasAllTags) return false;
-
-        if (state.query) {
-            /* The name is also indexed with punctuation stripped, so "oasis"
-               finds "O.A.S.I.S." and "4ckorg" finds "4ck.org". */
-            const haystack = (
-                p.name + " " + p.name.replace(/[.\-_/\s]/g, "") + " " +
-                localize(p.desc) + " " + (p.tags || []).join(" ")
-            ).toLowerCase();
-            if (haystack.indexOf(state.query) === -1) return false;
+    function prettyUrl(url) {
+        try {
+            const u = new URL(url);
+            return u.host + (u.pathname === "/" ? "" : u.pathname.replace(/\/$/, ""));
+        } catch (e) {
+            return url;
         }
-        return true;
     }
 
     function statusLabel(status) {
@@ -243,15 +239,27 @@
         const head = document.createElement("div");
         head.className = "project-card__head";
 
+        const titles = document.createElement("div");
+        titles.className = "project-card__titles";
+
         const title = document.createElement("h3");
         title.className = "project-card__title";
         title.textContent = p.name;
+        titles.append(title);
+
+        // Small URL revealed on hover/focus, underneath the name
+        if (p.url) {
+            const urlEl = document.createElement("span");
+            urlEl.className = "project-card__url";
+            urlEl.textContent = prettyUrl(p.url);
+            titles.append(urlEl);
+        }
 
         const badge = document.createElement("span");
         badge.className = "badge badge--" + p.status;
         badge.textContent = statusLabel(p.status);
 
-        head.append(title, badge);
+        head.append(titles, badge);
 
         const desc = document.createElement("p");
         desc.className = "project-card__desc";
@@ -285,17 +293,9 @@
             const tag = document.createElement("button");
             tag.type = "button";
             tag.className = "tag";
-            tag.dataset.tag = tagText;
             tag.textContent = tagText;
-            tag.setAttribute("aria-pressed",
-                state.tags.indexOf(tagText) !== -1 ? "true" : "false");
-            // Bubbles up to the document, where main.js toggles the filter.
-            tag.addEventListener("click", function (e) {
-                e.preventDefault();
-                tag.dispatchEvent(new CustomEvent("project:tag", {
-                    detail: tagText,
-                    bubbles: true
-                }));
+            tag.addEventListener("click", function () {
+                document.dispatchEvent(new CustomEvent("project:tag", { detail: tagText }));
             });
             tags.append(tag);
         });
@@ -316,9 +316,17 @@
         foot.append(tags, link);
         li.append(foot);
 
-        // Whole-card click opens the project (mirrors the "Visit" link),
-        // while keeping the real anchor for keyboard & assistive tech.
-        if (p.url) {
+        // Easter-egg card: clicking never reloads, it triggers a random effect.
+        if (p.egg) {
+            li.classList.add("project-card--clickable");
+            li.addEventListener("click", function (e) {
+                if (e.target.closest("button.tag")) return;
+                e.preventDefault();
+                if (window.PortalEgg) window.PortalEgg.trigger(li);
+            });
+        } else if (p.url) {
+            // Whole-card click opens the project (mirrors the "Visit" link),
+            // while keeping the real anchor for keyboard & assistive tech.
             li.classList.add("project-card--clickable");
 
             const openCard = function (e) {
@@ -345,22 +353,34 @@
         return li;
     }
 
-    function render(filter, query, tags) {
-        state = {
-            filter: filter || "all",
-            query: (query || "").trim().toLowerCase(),
-            tags: (tags || []).slice()
-        };
+    function matches(p, filter, query, tags) {
+        if (filter !== "all" && p.status !== filter) return false;
+        if (tags.length && !tags.every(function (t) {
+            return (p.tags || []).indexOf(t) !== -1;
+        })) return false;
+        if (query) {
+            const hay = (p.name + " " + localize(p.desc) + " " +
+                (p.tags || []).join(" ")).toLowerCase();
+            if (hay.indexOf(query) === -1) return false;
+        }
+        return true;
+    }
 
+    function render(filter, query, tags) {
         const grid = document.getElementById("project-grid");
         if (!grid) return;
         grid.innerHTML = "";
 
-        const pool = visibleProjects();
-        const list = pool.filter(matches);
+        filter = filter || "all";
+        const q = (query || "").trim().toLowerCase();
+        const activeTags = tags || [];
 
-        const countEl = document.getElementById("project-count");
-        if (countEl) countEl.textContent = list.length + " / " + pool.length;
+        const list = PROJECTS.filter(function (p) {
+            return matches(p, filter, q, activeTags);
+        });
+
+        const count = document.getElementById("project-count");
+        if (count) count.textContent = list.length + " / " + PROJECTS.length;
 
         if (list.length === 0) {
             const empty = document.createElement("li");
@@ -376,6 +396,14 @@
     window.Projects = {
         render: render,
         get all() { return PROJECTS.slice(); },
-        get tags() { return allTags(); }
+        get tags() {
+            const seen = [];
+            PROJECTS.forEach(function (p) {
+                (p.tags || []).forEach(function (t) {
+                    if (seen.indexOf(t) === -1) seen.push(t);
+                });
+            });
+            return seen.sort();
+        }
     };
 })();

@@ -1,5 +1,5 @@
 /* ============================================================
-   particles.js — Canvas space background.
+   particles.js - Canvas space background.
    Stars + drifting particles + parallax planets that react to
    the cursor. Pure Canvas 2D, no dependencies.
    Respects reduced-motion (OS preference or in-page toggle).
@@ -25,6 +25,7 @@
 
     let rafId = null;
     let running = false;
+    let warpUntil = 0;
 
     const COLORS = ["#4fd6ff", "#2b8bff", "#8a6bff", "#ffffff"];
 
@@ -144,15 +145,29 @@
         });
 
         // Stars
+        const warping = time < warpUntil;
+        const wcx = width / 2;
+        const wcy = height / 2;
         for (let i = 0; i < stars.length; i++) {
             const s = stars[i];
             const tw = 0.5 + 0.5 * Math.sin(time * 0.002 + s.twk);
             const ox = -pointer.x * 12 * s.depth;
             const oy = -pointer.y * 12 * s.depth;
-            ctx.beginPath();
-            ctx.fillStyle = "rgba(234, 242, 255," + (0.35 + tw * 0.5) + ")";
-            ctx.arc(s.x + ox, s.y + oy, s.r, 0, Math.PI * 2);
-            ctx.fill();
+            if (warping) {
+                // Hyperjump: streak stars outward from the center
+                const k = 0.16 * s.depth;
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba(234, 242, 255," + (0.35 + tw * 0.5) + ")";
+                ctx.lineWidth = s.r;
+                ctx.moveTo(s.x + ox, s.y + oy);
+                ctx.lineTo(s.x + ox + (s.x - wcx) * k, s.y + oy + (s.y - wcy) * k);
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.fillStyle = "rgba(234, 242, 255," + (0.35 + tw * 0.5) + ")";
+                ctx.arc(s.x + ox, s.y + oy, s.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
         // Particles: drift + cursor attraction
@@ -290,7 +305,10 @@
 
     // Public API so the Motion toggle can restart the loop
     window.SpaceBG = {
-        refresh: function () { stop(); start(); }
+        refresh: function () { stop(); start(); },
+        warp: function (ms) {
+            if (running) warpUntil = performance.now() + (ms || 1000);
+        }
     };
 
     // ---------- Init ----------

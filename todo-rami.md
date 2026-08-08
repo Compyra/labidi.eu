@@ -24,6 +24,8 @@ Outstanding tasks gathered from across the projects.
 
 ## labidi.eu (start page)
 - Keep the projects catalogue up to date (`js/projects.js`).
+- Temporal Portal easter egg is live (`js/egg.js`): each click picks randomly
+  from hyperjump, UFO abduction, passport stamp or wormhole greeting.
 
 ## Done
 - [x] Move Mail Ward (the SPF/DKIM/DMARC guide + email header analyzer + volume

@@ -1,5 +1,5 @@
 /* ============================================================
-   main.js — Bootstraps the page: i18n, projects, controls,
+   main.js - Bootstraps the page: i18n, projects, controls,
    clock, filters, theme/motion toggles, card cursor glow.
    Runs after other scripts (all use `defer`).
    ============================================================ */
@@ -223,6 +223,31 @@
         });
     }
 
+    /* ---------- Urgent help (SOS) dialog ---------- */
+    function initSos() {
+        const dialog = document.getElementById("sos-dialog");
+        const openBtn = document.getElementById("sos-open");
+        if (!dialog || !openBtn) return;
+
+        openBtn.addEventListener("click", function () {
+            if (typeof dialog.showModal === "function") dialog.showModal();
+            else dialog.setAttribute("open", "");
+        });
+
+        const closeBtn = document.getElementById("sos-close");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                if (typeof dialog.close === "function") dialog.close();
+                else dialog.removeAttribute("open");
+            });
+        }
+
+        // A click on the backdrop lands on the dialog element itself.
+        dialog.addEventListener("click", function (e) {
+            if (e.target === dialog && typeof dialog.close === "function") dialog.close();
+        });
+    }
+
     /* ---------- Boot ---------- */
     function boot() {
         initLanguage();          // sets lang + applies static text
@@ -231,6 +256,7 @@
         renderProjects();
         initClock();
         initFilters();
+        initSos();
         initTheme();
         initMotion();
         initCardGlow();

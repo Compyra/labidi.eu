@@ -1,5 +1,5 @@
 /* ============================================================
-   components.css — Brand, nav, controls, filters, project cards
+   components.css - Brand, nav, controls, filters, project cards
    ============================================================ */
 
 /* ---------- Brand ---------- */
@@ -304,8 +304,33 @@
     gap: var(--sp-3);
 }
 
+.project-card__titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
 .project-card__title {
     font-size: 1.2rem;
+}
+
+/* Small project URL, revealed on hover/focus */
+.project-card__url {
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    color: var(--glow-cyan);
+    overflow-wrap: anywhere;
+    opacity: 0;
+    transform: translateY(-3px);
+    transition: opacity var(--dur-fast) var(--ease),
+                transform var(--dur-fast) var(--ease);
+}
+
+.project-card:hover .project-card__url,
+.project-card:focus-within .project-card__url {
+    opacity: 1;
+    transform: none;
 }
 
 .project-card__desc {
@@ -338,7 +363,7 @@
 
 .badge--active { color: var(--status-active); }
 .badge--finished { color: var(--status-finished); }
-.badge--archived { color: var(--status-archived); }
+.badge--soon { color: var(--status-soon); }
 
 /* Progress bar */
 .progress {
@@ -428,4 +453,138 @@ button.tag[aria-pressed="true"] {
     text-align: center;
     color: var(--text-dim);
     padding: var(--sp-12);
+}
+
+/* ---------- Urgent help (SOS) ---------- */
+.control--sos {
+    gap: var(--sp-2);
+    color: #fff;
+    font-weight: 600;
+    background: linear-gradient(120deg, #e5484d, #b3123f);
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+.control--sos:hover,
+.control--sos:focus-visible {
+    color: #fff;
+    border-color: #ffb3bd;
+    box-shadow: 0 0 18px rgba(229, 72, 77, 0.55);
+}
+
+.sos-dialog {
+    margin: auto;
+    width: min(560px, calc(100vw - 2 * var(--sp-6)));
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--text-primary);
+    background:
+        radial-gradient(600px 300px at 80% -20%, var(--space-600), transparent 70%),
+        var(--space-800);
+    box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+
+:root[data-theme="light"] .sos-dialog {
+    background:
+        radial-gradient(600px 300px at 80% -20%, var(--space-800), transparent 70%),
+        #f2f6ff;
+}
+
+.sos-dialog::backdrop {
+    background: rgba(3, 8, 22, 0.72);
+}
+
+.sos-dialog__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    padding: var(--sp-6);
+}
+
+.sos-dialog__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sp-3);
+}
+
+.sos-dialog__title {
+    font-size: 1.3rem;
+}
+
+.sos-dialog__close {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    display: inline-grid;
+    place-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease);
+}
+
+.sos-dialog__close:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+}
+
+.sos-dialog__lead {
+    color: var(--text-muted);
+}
+
+.sos-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+}
+
+.sos-option {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: var(--sp-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--dur-fast) var(--ease),
+                transform var(--dur-fast) var(--ease),
+                box-shadow var(--dur-fast) var(--ease);
+}
+
+.sos-option:hover,
+.sos-option:focus-visible {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.sos-option__title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.sos-option__desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.sos-option__domain {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--glow-cyan);
+}
+
+.sos-dialog__contact {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    padding-top: var(--sp-4);
+}
+
+.sos-dialog__mail {
+    font-weight: 600;
+    white-space: nowrap;
 }

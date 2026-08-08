@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="labidi.eu — a futuristic portal for projects, navigation and temporal exploration.">
+    <meta name="description" content="labidi.eu: a futuristic portal for projects, navigation and temporal exploration.">
     <meta name="theme-color" content="#0a1a3f">
     <meta name="color-scheme" content="dark light">
     <title>labidi.eu // Temporal Portal</title>
@@ -43,6 +43,11 @@
         </nav>
 
         <div class="header-controls">
+            <button id="sos-open" class="control control--btn control--sos" type="button">
+                <span aria-hidden="true">&#9888;</span>
+                <span data-i18n="sos.button">I need help</span>
+            </button>
+
             <label class="control control--select" for="lang-select">
                 <span class="sr-only" data-i18n="controls.language">Language</span>
                 <select id="lang-select" aria-label="Language">
@@ -91,7 +96,7 @@
                 <button class="filter is-active" type="button" data-filter="all" data-i18n="filters.all">All</button>
                 <button class="filter" type="button" data-filter="active" data-i18n="filters.active">Active</button>
                 <button class="filter" type="button" data-filter="finished" data-i18n="filters.finished">Finished</button>
-                <button class="filter" type="button" data-filter="archived" data-i18n="filters.archived">Archived</button>
+                <button class="filter" type="button" data-filter="soon" data-i18n="filters.soon">Soon</button>
             </div>
 
             <div class="project-search">
@@ -122,11 +127,46 @@
                 <h2 id="about-title" class="section-head__title" data-i18n="about.title">About this portal</h2>
             </div>
             <p class="about__text" data-i18n="about.text">
-                A centralized hub for navigation, project management and visitor information —
+                A centralized hub for navigation, project management and visitor information,
                 built with pure HTML, CSS and JavaScript. No frameworks, no dependencies, no tracking.
             </p>
         </section>
     </main>
+
+    <!-- ===================== URGENT HELP DIALOG ===================== -->
+    <dialog id="sos-dialog" class="sos-dialog" aria-labelledby="sos-title">
+        <div class="sos-dialog__body">
+            <div class="sos-dialog__head">
+                <h2 id="sos-title" class="sos-dialog__title" data-i18n="sos.title">Need help right now?</h2>
+                <button id="sos-close" class="sos-dialog__close" type="button"
+                        aria-label="Close" data-i18n-aria-label="sos.close">&#10005;</button>
+            </div>
+            <p class="sos-dialog__lead" data-i18n="sos.lead">Pick the situation that matches yours.</p>
+
+            <div class="sos-options">
+                <a class="sos-option" href="https://oasis-online.labidi.eu" rel="noopener noreferrer">
+                    <span class="sos-option__title" data-i18n="sos.online.title">I need someone, right now</span>
+                    <span class="sos-option__desc" data-i18n="sos.online.desc">Society is working and you have network access. Find official helplines and someone to talk to.</span>
+                    <span class="sos-option__domain">oasis-online.labidi.eu</span>
+                </a>
+                <a class="sos-option" href="https://oasis.labidi.eu" rel="noopener noreferrer">
+                    <span class="sos-option__title" data-i18n="sos.offline.title">Society is not OK, or I have no network</span>
+                    <span class="sos-option__desc" data-i18n="sos.offline.desc">An offline survival guide with the knowledge to keep going when nothing else works.</span>
+                    <span class="sos-option__domain">oasis.labidi.eu</span>
+                </a>
+                <a class="sos-option" href="https://breach.labidi.eu" rel="noopener noreferrer">
+                    <span class="sos-option__title" data-i18n="sos.cyber.title">I got phished, hacked or scammed</span>
+                    <span class="sos-option__desc" data-i18n="sos.cyber.desc">First aid for online incidents: what to do the moment after you clicked.</span>
+                    <span class="sos-option__domain">breach.labidi.eu</span>
+                </a>
+            </div>
+
+            <p class="sos-dialog__contact">
+                <span data-i18n="sos.contact">Something else going on? Contact me and I will see what I can do to help.</span>
+                <a class="sos-dialog__mail" href="mailto:info@labidi.eu">info@labidi.eu</a>
+            </p>
+        </div>
+    </dialog>
 
     <!-- ===================== FOOTER ===================== -->
     <footer id="contact" class="site-footer" role="contentinfo">
@@ -159,6 +199,7 @@
 
     <!-- Scripts: order matters (data + i18n before main) -->
     <script src="js/i18n.js" defer></script>
+    <script src="js/egg.js" defer></script>
     <script src="js/projects.js" defer></script>
     <script src="js/particles.js" defer></script>
     <script src="js/main.js" defer></script>

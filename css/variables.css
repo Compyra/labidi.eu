@@ -1,16 +1,16 @@
 /* ============================================================
-   variables.css — Design tokens
+   variables.css - Design tokens
    ============================================================ */
 
 :root {
-    /* Core palette — deep space blues */
+    /* Core palette: deep space blues */
     --space-900: #030816;
     --space-800: #050c24;
     --space-700: #0a1a3f;
     --space-600: #0f2657;
     --space-500: #17408b;
 
-    /* Accents — temporal glow */
+    /* Accents: temporal glow */
     --glow-cyan: #4fd6ff;
     --glow-blue: #2b8bff;
     --glow-purple: #8a6bff;
@@ -30,7 +30,7 @@
     /* Status colors */
     --status-active: #4fd6ff;
     --status-finished: #57e39b;
-    --status-archived: #b08cff;
+    --status-soon: #b08cff;
 
     /* Typography */
     --font-sans: "Segoe UI", "Helvetica Neue", system-ui, -apple-system, sans-serif;
@@ -72,14 +72,25 @@
     --space-600: #a9c2f4;
     --space-500: #7ea3e6;
 
+    /* Darker accents so text stays readable on light surfaces */
+    --glow-cyan: #0b5e9e;
+    --glow-blue: #1550b8;
+    --glow-purple: #5b36c4;
+    --glow-gold: #8a6400;
+
     --text-primary: #0a1a3f;
     --text-muted: #274170;
-    --text-dim: #4a628f;
+    --text-dim: #44598a;
 
     --surface: rgba(255, 255, 255, 0.55);
     --surface-strong: rgba(255, 255, 255, 0.78);
-    --border: rgba(23, 64, 139, 0.18);
-    --border-strong: rgba(23, 64, 139, 0.4);
+    --border: rgba(23, 64, 139, 0.26);
+    --border-strong: rgba(23, 64, 139, 0.5);
 
+    --status-active: #0b5e9e;
+    --status-finished: #14713f;
+    --status-soon: #5b36c4;
+
+    --shadow-glow: 0 0 24px rgba(21, 80, 184, 0.25);
     --shadow-card: 0 12px 40px rgba(23, 64, 139, 0.18);
 }
