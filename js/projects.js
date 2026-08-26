@@ -14,6 +14,19 @@
        egg: true => clicking never navigates (easter-egg hook) */
     const PROJECTS = [
         {
+            name: "MS Portal Hub",
+            desc: {
+                en: "Keyboard-first command line for Microsoft admins: portals, settings, runbooks, KQL and licensing answers behind one search box.",
+                fr: "Ligne de commande au clavier pour les admins Microsoft : portails, param\u00e8tres, runbooks, KQL et r\u00e9ponses de licences derri\u00e8re une seule recherche.",
+                de: "Tastatur-Kommandozeile f\u00fcr Microsoft-Admins: Portale, Einstellungen, Runbooks, KQL und Lizenzantworten hinter einem Suchfeld.",
+                ar: "\u0633\u0637\u0631 \u0623\u0648\u0627\u0645\u0631 \u0628\u0644\u0648\u062d\u0629 \u0627\u0644\u0645\u0641\u0627\u062a\u064a\u062d \u0644\u0645\u0633\u0624\u0648\u0644\u064a \u0645\u0627\u064a\u0643\u0631\u0648\u0633\u0648\u0641\u062a: \u0628\u0648\u0627\u0628\u0627\u062a \u0648\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0648\u0623\u062f\u0644\u0629 \u062a\u0634\u063a\u064a\u0644 \u0648KQL \u0648\u0625\u062c\u0627\u0628\u0627\u062a \u0627\u0644\u062a\u0631\u0627\u062e\u064a\u0635 \u062e\u0644\u0641 \u0645\u0631\u0628\u0639 \u0628\u062d\u062b \u0648\u0627\u062d\u062f."
+            },
+            status: "active",
+            progress: 90,
+            url: "https://ms.labidi.eu",
+            tags: ["Tools", "Security", "Help"]
+        },
+        {
             name: "GhostTooth",
             desc: {
                 en: "Real-time Bluetooth surveillance & tracker detector running fully in the browser.",

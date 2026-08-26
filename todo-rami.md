@@ -2,6 +2,15 @@
 
 Outstanding tasks gathered from across the projects.
 
+## ms.labidi.eu (MS Portal Hub)
+
+- Launch remainder (phase 8): push to GitHub Pages, confirm DNS + Cloudflare
+  (Rocket Loader / Email Obfuscation / Analytics OFF), Lighthouse pass on prod,
+  live gate: `?go=enca` works and the PWA installs from https://ms.labidi.eu.
+- Provide a test tenant and work through `docs/17-tenant-verification.md`
+  (blocking gates A1-A5, deep-link walks B1-B7, licensing claims C1-C9).
+- Human gate: one service desk shift uses two runbooks unaided (docs/17 A5).
+
 ## ghosttooth.labidi.eu
 
 ### Version 3 (not started yet)
