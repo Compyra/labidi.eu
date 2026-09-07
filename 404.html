@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="labidi.eu: a futuristic portal for projects, navigation and temporal exploration.">
+    <meta name="description" content="Temporal anomaly: the page you requested does not exist in this timeline.">
+    <meta name="robots" content="noindex">
     <meta name="theme-color" content="#0a1a3f">
     <meta name="color-scheme" content="dark light">
-    <title>labidi.eu // Temporal Portal</title>
+    <title>labidi.eu // 404: Temporal Anomaly</title>
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%B8%3C/text%3E%3C/svg%3E">
 
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/pages.css">
 </head>
 <body>
     <!-- Background canvas: space particles + planets -->
@@ -26,19 +28,19 @@
 
     <!-- ===================== HEADER ===================== -->
     <header class="site-header" role="banner">
-        <div class="brand">
+        <a class="brand" href="/">
             <span class="brand__mark" aria-hidden="true">
                 <span class="brand__ring"></span>
                 <span class="brand__core"></span>
             </span>
             <span class="brand__name">labidi<span class="brand__dot">.</span>eu</span>
-        </div>
+        </a>
 
         <nav class="main-nav" aria-label="Primary">
             <ul class="main-nav__list">
-                <li><a class="main-nav__link" href="#projects" data-i18n="nav.projects">Projects</a></li>
-                <li><a class="main-nav__link" href="#about" data-i18n="nav.about">About</a></li>
-                <li><a class="main-nav__link" href="#contact" data-i18n="nav.contact">Contact</a></li>
+                <li><a class="main-nav__link" href="/#projects" data-i18n="nav.projects">Projects</a></li>
+                <li><a class="main-nav__link" href="/#about" data-i18n="nav.about">About</a></li>
+                <li><a class="main-nav__link" href="/#contact" data-i18n="nav.contact">Contact</a></li>
             </ul>
         </nav>
 
@@ -70,66 +72,43 @@
 
     <!-- ===================== MAIN ===================== -->
     <main id="main" class="site-main">
+        <section class="anomaly" aria-labelledby="anomaly-title">
+            <p class="welcome__eyebrow" data-i18n="notfound.eyebrow">Temporal anomaly detected</p>
 
-        <!-- Welcome banner -->
-        <section class="welcome" aria-labelledby="welcome-title">
-            <p class="welcome__eyebrow" data-i18n="welcome.eyebrow">Incoming transmission</p>
-            <h1 id="welcome-title" class="welcome__title">
-                <span data-i18n="welcome.greeting">Welcome, visitor</span>
+            <div class="anomaly__code" role="img" aria-label="404">
+                <span class="anomaly__digit">4</span>
+                <span class="anomaly__portal">
+                    <span class="anomaly__portal-ring"></span>
+                    <span class="anomaly__portal-core"></span>
+                </span>
+                <span class="anomaly__digit">4</span>
+            </div>
+
+            <h1 id="anomaly-title" class="anomaly__title" data-i18n="notfound.title">
+                This page is lost in the vortex
             </h1>
-            <p class="welcome__subtitle" data-i18n="welcome.subtitle">
-                You have arrived at a fixed point in space and time.
+            <p class="anomaly__subtitle" data-i18n="notfound.subtitle">
+                The coordinates you followed do not exist in this timeline.
+                The page may have been moved, erased, or never built.
             </p>
+
+            <p class="anomaly__path">
+                <span data-i18n="notfound.path">Requested coordinates</span>
+                <code id="lost-path">/unknown</code>
+            </p>
+
+            <div class="anomaly__actions">
+                <a class="btn btn--primary" href="/">
+                    <span aria-hidden="true">&#x1F6F8;</span>
+                    <span data-i18n="notfound.home">Return to the portal</span>
+                </a>
+                <a id="report-link" class="btn btn--ghost" href="mailto:info@labidi.eu?subject=Temporal%20anomaly%20report">
+                    <span aria-hidden="true">&#x1F4E1;</span>
+                    <span data-i18n="notfound.report">Report this anomaly</span>
+                </a>
+            </div>
+
             <p class="welcome__clock" id="clock" aria-live="polite"></p>
-        </section>
-
-        <!-- Projects -->
-        <section id="projects" class="projects" aria-labelledby="projects-title">
-            <div class="section-head">
-                <h2 id="projects-title" class="section-head__title" data-i18n="projects.title">Projects</h2>
-                <p class="section-head__lead" data-i18n="projects.lead">
-                    A catalogue of ongoing experiments, completed builds and archived timelines.
-                </p>
-            </div>
-
-            <div class="filters" role="group" aria-label="Filter projects">
-                <button class="filter is-active" type="button" data-filter="all" data-i18n="filters.all">All</button>
-                <button class="filter" type="button" data-filter="active" data-i18n="filters.active">Active</button>
-                <button class="filter" type="button" data-filter="finished" data-i18n="filters.finished">Finished</button>
-                <button class="filter" type="button" data-filter="soon" data-i18n="filters.soon">Soon</button>
-            </div>
-
-            <div class="project-search">
-                <label class="sr-only" for="project-search-input" data-i18n="search.label">Search projects</label>
-                <div class="project-search__field">
-                    <span class="project-search__icon" aria-hidden="true">&#9906;</span>
-                    <input id="project-search-input" class="project-search__input" type="search"
-                           autocomplete="off" spellcheck="false"
-                           placeholder="Search projects, tags&hellip;"
-                           data-i18n-placeholder="search.placeholder">
-                </div>
-                <p id="project-count" class="project-search__count" aria-live="polite"></p>
-            </div>
-
-            <div class="tagbar">
-                <div id="tag-cloud" class="tag-cloud" role="group"
-                     aria-label="Filter by tag" data-i18n-aria-label="tags.label"></div>
-                <button id="tag-clear" class="tag-chip tag-chip--clear" type="button" hidden
-                        data-i18n="tags.clear">Clear tags</button>
-            </div>
-
-            <ul id="project-grid" class="project-grid"></ul>
-        </section>
-
-        <!-- About -->
-        <section id="about" class="about" aria-labelledby="about-title">
-            <div class="section-head">
-                <h2 id="about-title" class="section-head__title" data-i18n="about.title">About this portal</h2>
-            </div>
-            <p class="about__text" data-i18n="about.text">
-                A centralized hub for navigation, project management and visitor information,
-                built with pure HTML, CSS and JavaScript. No frameworks, no dependencies, no tracking.
-            </p>
         </section>
     </main>
 
@@ -198,11 +177,24 @@
         </p>
     </footer>
 
-    <!-- Scripts: order matters (data + i18n before main) -->
-    <script src="js/i18n.js" defer></script>
-    <script src="js/egg.js" defer></script>
-    <script src="js/projects.js" defer></script>
-    <script src="js/particles.js" defer></script>
-    <script src="js/main.js" defer></script>
+    <!-- Scripts: order matters (i18n before main) -->
+    <script src="/js/i18n.js" defer></script>
+    <script src="/js/particles.js" defer></script>
+    <script src="/js/main.js" defer></script>
+
+    <!-- Show the coordinates that led nowhere (textContent only: XSS-safe) -->
+    <script>
+        (function () {
+            "use strict";
+            var lost = window.location.pathname + window.location.search;
+            var pathEl = document.getElementById("lost-path");
+            if (pathEl) pathEl.textContent = lost;
+            var report = document.getElementById("report-link");
+            if (report) {
+                report.href = "mailto:info@labidi.eu?subject=" +
+                    encodeURIComponent("Temporal anomaly report: " + lost);
+            }
+        })();
+    </script>
 </body>
 </html>

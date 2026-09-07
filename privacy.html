@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy policy for labidi.eu: no tracking, no cookies, no analytics. Your preferences stay in your browser.">
+    <meta name="theme-color" content="#0a1a3f">
+    <meta name="color-scheme" content="dark light">
+    <title>labidi.eu // Privacy</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%B8%3C/text%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/pages.css">
+</head>
+<body>
+    <!-- Background canvas: space particles + planets -->
+    <canvas id="space-canvas" aria-hidden="true"></canvas>
+
+    <!-- Skip link for accessibility -->
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="site-header" role="banner">
+        <a class="brand" href="/">
+            <span class="brand__mark" aria-hidden="true">
+                <span class="brand__ring"></span>
+                <span class="brand__core"></span>
+            </span>
+            <span class="brand__name">labidi<span class="brand__dot">.</span>eu</span>
+        </a>
+
+        <nav class="main-nav" aria-label="Primary">
+            <ul class="main-nav__list">
+                <li><a class="main-nav__link" href="/#projects" data-i18n="nav.projects">Projects</a></li>
+                <li><a class="main-nav__link" href="/#about" data-i18n="nav.about">About</a></li>
+                <li><a class="main-nav__link" href="/#contact" data-i18n="nav.contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-controls">
+            <button id="sos-open" class="control control--btn control--sos" type="button">
+                <span aria-hidden="true">&#9888;</span>
+                <span data-i18n="sos.button">I need help</span>
+            </button>
+
+            <label class="control control--select" for="lang-select">
+                <span class="sr-only" data-i18n="controls.language">Language</span>
+                <select id="lang-select" aria-label="Language">
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                    <option value="de">DE</option>
+                    <option value="ar">AR</option>
+                </select>
+            </label>
+
+            <button id="motion-toggle" class="control control--btn" type="button" aria-pressed="false">
+                <span data-i18n="controls.motion">Motion</span>
+            </button>
+
+            <button id="theme-toggle" class="control control--btn" type="button" aria-pressed="false">
+                <span data-i18n="controls.theme">Theme</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===================== MAIN ===================== -->
+    <main id="main" class="site-main">
+
+        <!-- Hero -->
+        <section class="welcome welcome--compact" aria-labelledby="privacy-title">
+            <p class="welcome__eyebrow" data-i18n="privacy.eyebrow">Transparency transmission</p>
+            <h1 id="privacy-title" class="welcome__title" data-i18n="privacy.title">Privacy</h1>
+            <p class="welcome__subtitle" data-i18n="privacy.subtitle">
+                How this portal treats your data: in short, it does not want any.
+            </p>
+            <p class="privacy-updated">
+                <span data-i18n="privacy.updated">Last updated</span>:
+                <time datetime="2026-09-07">2026-09-07</time>
+            </p>
+            <p class="privacy-tldr" data-i18n="privacy.tldr">
+                The short version: this site collects no personal data, sets no cookies
+                and runs no trackers. Everything below is detail.
+            </p>
+        </section>
+
+        <!-- Policy cards -->
+        <section class="privacy" aria-label="Policy details">
+            <ul class="privacy-grid">
+                <li class="privacy-card">
+                    <span class="privacy-card__icon" aria-hidden="true">&#x1F6E1;&#xFE0F;</span>
+                    <h2 class="privacy-card__title" data-i18n="privacy.tracking.title">No tracking</h2>
+                    <p class="privacy-card__text" data-i18n="privacy.tracking.text">
+                        No analytics, no advertising, no fingerprinting, no cookies, no
+                        third-party scripts. Visits are not counted, profiled or shared.
+                        What you do here stays between you and your browser.
+                    </p>
+                </li>
+
+                <li class="privacy-card">
+                    <span class="privacy-card__icon" aria-hidden="true">&#x1F4BE;</span>
+                    <h2 class="privacy-card__title" data-i18n="privacy.storage.title">Preferences on your device</h2>
+                    <p class="privacy-card__text" data-i18n="privacy.storage.text">
+                        Theme, motion and language choices are saved in your browser's
+                        local storage so the portal remembers them. They never leave your
+                        device, and clearing your browser data removes them completely.
+                    </p>
+                </li>
+
+                <li class="privacy-card">
+                    <span class="privacy-card__icon" aria-hidden="true">&#x2601;&#xFE0F;</span>
+                    <h2 class="privacy-card__title" data-i18n="privacy.hosting.title">Hosting</h2>
+                    <p class="privacy-card__text" data-i18n="privacy.hosting.text">
+                        This site is served as static files by GitHub Pages. Like any web
+                        host, GitHub may log requests (such as IP addresses) for security
+                        and operational reasons; I never see or use those logs.
+                    </p>
+                    <a class="privacy-card__link"
+                       href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement"
+                       target="_blank" rel="noopener noreferrer"
+                       data-i18n="privacy.hosting.link">GitHub Privacy Statement</a>
+                </li>
+
+                <li class="privacy-card">
+                    <span class="privacy-card__icon" aria-hidden="true">&#x1F30C;</span>
+                    <h2 class="privacy-card__title" data-i18n="privacy.links.title">Other destinations</h2>
+                    <p class="privacy-card__text" data-i18n="privacy.links.text">
+                        Projects listed here link to other sites and subdomains, each with
+                        its own privacy practices. This policy covers labidi.eu only, so
+                        check the destination when you travel onwards.
+                    </p>
+                </li>
+
+                <li class="privacy-card">
+                    <span class="privacy-card__icon" aria-hidden="true">&#x1F4E8;</span>
+                    <h2 class="privacy-card__title" data-i18n="privacy.email.title">If you email me</h2>
+                    <p class="privacy-card__text" data-i18n="privacy.email.text">
+                        Writing to info@labidi.eu shares whatever you put in the message.
+                        It is used only to reply to you, is never added to any list and is
+                        never passed to anyone else.
+                    </p>
+                </li>
+
+                <li class="privacy-card">
+                    <span class="privacy-card__icon" aria-hidden="true">&#x1F570;&#xFE0F;</span>
+                    <h2 class="privacy-card__title" data-i18n="privacy.changes.title">Changes</h2>
+                    <p class="privacy-card__text" data-i18n="privacy.changes.text">
+                        If anything about this policy changes, the update appears on this
+                        page with a new date. There is no tracking to add, so do not
+                        expect much drama.
+                    </p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Contact -->
+        <p class="privacy-contact">
+            <span data-i18n="privacy.contact">Questions about any of this? Ask directly:</span>
+            <a class="privacy-contact__mail" href="mailto:info@labidi.eu">info@labidi.eu</a>
+        </p>
+    </main>
+
+    <!-- ===================== URGENT HELP DIALOG ===================== -->
+    <dialog id="sos-dialog" class="sos-dialog" aria-labelledby="sos-title">
+        <div class="sos-dialog__body">
+            <div class="sos-dialog__head">
+                <h2 id="sos-title" class="sos-dialog__title" data-i18n="sos.title">Need help right now?</h2>
+                <button id="sos-close" class="sos-dialog__close" type="button"
+                        aria-label="Close" data-i18n-aria-label="sos.close">&#10005;</button>
+            </div>
+            <p class="sos-dialog__lead" data-i18n="sos.lead">Pick the situation that matches yours.</p>
+
+            <div class="sos-options">
+                <a class="sos-option" href="https://help.labidi.eu" rel="noopener noreferrer">
+                    <span class="sos-option__title" data-i18n="sos.online.title">I need someone, right now</span>
+                    <span class="sos-option__desc" data-i18n="sos.online.desc">Society is working and you have network access. Find official helplines and someone to talk to.</span>
+                    <span class="sos-option__domain">help.labidi.eu</span>
+                </a>
+                <a class="sos-option" href="https://oasis.labidi.eu" rel="noopener noreferrer">
+                    <span class="sos-option__title" data-i18n="sos.offline.title">Society is not OK, or I have no network</span>
+                    <span class="sos-option__desc" data-i18n="sos.offline.desc">An offline survival guide with the knowledge to keep going when nothing else works.</span>
+                    <span class="sos-option__domain">oasis.labidi.eu</span>
+                </a>
+                <a class="sos-option" href="https://breach.labidi.eu" rel="noopener noreferrer">
+                    <span class="sos-option__title" data-i18n="sos.cyber.title">I got phished, hacked or scammed</span>
+                    <span class="sos-option__desc" data-i18n="sos.cyber.desc">First aid for online incidents: what to do the moment after you clicked.</span>
+                    <span class="sos-option__domain">breach.labidi.eu</span>
+                </a>
+            </div>
+
+            <p class="sos-dialog__contact">
+                <span data-i18n="sos.contact">Something else going on? Contact me and I will see what I can do to help.</span>
+                <a class="sos-dialog__mail" href="mailto:info@labidi.eu">info@labidi.eu</a>
+            </p>
+        </div>
+    </dialog>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer id="contact" class="site-footer" role="contentinfo">
+        <div class="footer-realms">
+            <a class="footer-realm footer-realm--business" href="https://compyra.com"
+               target="_blank" rel="noopener noreferrer">
+                <span class="footer-realm__label" data-i18n="footer.business">Business</span>
+                <span class="footer-realm__name">compyra.com</span>
+            </a>
+
+            <div class="footer-contact">
+                <span class="footer-contact__label" data-i18n="footer.contact">Contact</span>
+                <a class="footer-contact__mail" href="mailto:info@labidi.eu">info@labidi.eu</a>
+            </div>
+
+            <a class="footer-realm footer-realm--fun" href="https://rami.party"
+               target="_blank" rel="noopener noreferrer">
+                <span class="footer-realm__label" data-i18n="footer.fun">Fun</span>
+                <span class="footer-realm__name">rami.party</span>
+            </a>
+        </div>
+
+        <p class="site-footer__message" data-i18n="footer.message">
+            Safe travels through the vortex.
+        </p>
+        <p class="site-footer__meta">
+            <span id="footer-year"></span> &middot; labidi.eu &middot;
+            <a class="site-footer__privacy" href="/privacy.html" data-i18n="footer.privacy">Privacy</a>
+        </p>
+    </footer>
+
+    <!-- Scripts: order matters (i18n before main) -->
+    <script src="/js/i18n.js" defer></script>
+    <script src="/js/particles.js" defer></script>
+    <script src="/js/main.js" defer></script>
+</body>
+</html>

@@ -202,3 +202,16 @@
     font-size: 0.85rem;
     font-variant-numeric: tabular-nums;
 }
+
+.site-footer__privacy {
+    color: var(--text-dim);
+    border-bottom: 1px solid transparent;
+    transition: color var(--dur-fast) var(--ease),
+                border-color var(--dur-fast) var(--ease);
+}
+
+.site-footer__privacy:hover,
+.site-footer__privacy:focus-visible {
+    color: var(--glow-cyan);
+    border-bottom-color: var(--glow-cyan);
+}

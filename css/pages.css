@@ -1,0 +1,291 @@
+/* ============================================================
+   pages.css - Secondary pages: 404 anomaly + privacy policy
+   Loaded only by 404.html and privacy.html on top of the
+   shared stylesheets. Reuses the design tokens and the
+   float-in / spin-slow / pulse-ring keyframes.
+   ============================================================ */
+
+/* The brand is a link back home on subpages; keep its index look */
+a.brand {
+    color: var(--text-primary);
+}
+
+/* ---------- Pill buttons ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-6);
+    font-weight: 600;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform var(--dur-fast) var(--ease),
+                box-shadow var(--dur-fast) var(--ease),
+                border-color var(--dur-fast) var(--ease),
+                color var(--dur-fast) var(--ease);
+}
+
+.btn--primary {
+    color: var(--space-900);
+    background: linear-gradient(120deg, var(--glow-cyan), var(--glow-blue));
+    box-shadow: var(--shadow-glow);
+}
+
+:root[data-theme="light"] .btn--primary {
+    color: #fff;
+}
+
+.btn--primary:hover,
+.btn--primary:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow), var(--shadow-card);
+}
+
+.btn--ghost {
+    color: var(--text-muted);
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+.btn--ghost:hover,
+.btn--ghost:focus-visible {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+}
+
+/* ============================================================
+   404: temporal anomaly
+   ============================================================ */
+.anomaly {
+    text-align: center;
+    padding: clamp(var(--sp-8), 6vw, var(--sp-16)) 0 var(--sp-8);
+}
+
+/* Giant 404 with a spinning portal as the zero */
+.anomaly__code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(var(--sp-3), 3vw, var(--sp-8));
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 18vw, 10rem);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: var(--sp-8);
+    animation: float-in var(--dur-slow) var(--ease) both,
+               anomaly-glitch 7s steps(2, jump-none) 2s infinite;
+}
+
+.anomaly__digit {
+    background: linear-gradient(120deg, var(--text-primary), var(--glow-cyan) 55%, var(--glow-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.anomaly__portal {
+    position: relative;
+    width: 0.82em;
+    height: 0.82em;
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.anomaly__portal-ring {
+    position: absolute;
+    inset: 0;
+    border: 0.045em dashed var(--glow-cyan);
+    border-radius: 50%;
+    opacity: 0.8;
+    box-shadow: var(--shadow-glow), inset 0 0 0.4em rgba(79, 214, 255, 0.35);
+    animation: spin-slow 16s linear infinite;
+}
+
+.anomaly__portal-core {
+    width: 0.3em;
+    height: 0.3em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--glow-blue));
+    box-shadow: var(--shadow-glow);
+    animation: pulse-ring 4s var(--ease) infinite;
+}
+
+/* Every few seconds the signal jitters, then recovers */
+@keyframes anomaly-glitch {
+    0%, 91%, 100% { transform: none; filter: none; }
+    92% { transform: translate(-4px, 2px) skewX(-5deg); filter: hue-rotate(40deg); }
+    94% { transform: translate(3px, -2px) skewX(4deg); }
+    96% { transform: translate(-2px, 1px); filter: hue-rotate(-25deg); }
+    98% { transform: translate(1px, -1px); }
+}
+
+.anomaly__title {
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    animation: float-in var(--dur-slow) var(--ease) both;
+    animation-delay: 90ms;
+}
+
+.anomaly__subtitle {
+    margin: var(--sp-4) auto 0;
+    max-width: 52ch;
+    color: var(--text-muted);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    animation: float-in var(--dur-slow) var(--ease) both;
+    animation-delay: 180ms;
+}
+
+.anomaly__path {
+    margin-top: var(--sp-6);
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    animation: float-in var(--dur-slow) var(--ease) both;
+    animation-delay: 240ms;
+}
+
+.anomaly__path code {
+    display: inline-block;
+    margin-inline-start: var(--sp-2);
+    padding: 2px var(--sp-3);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 0.9em;
+    color: var(--glow-gold);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow-wrap: anywhere;
+    direction: ltr;
+    unicode-bidi: embed;
+}
+
+.anomaly__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-3);
+    margin-top: var(--sp-8);
+    animation: float-in var(--dur-slow) var(--ease) both;
+    animation-delay: 320ms;
+}
+
+.anomaly .welcome__clock {
+    animation-delay: 400ms;
+}
+
+/* ============================================================
+   Privacy policy
+   ============================================================ */
+
+/* Slightly tighter hero than the index welcome */
+.welcome--compact {
+    padding-bottom: 0;
+}
+
+.privacy-updated {
+    margin-top: var(--sp-6);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    animation: float-in var(--dur-slow) var(--ease) both;
+    animation-delay: 270ms;
+}
+
+.privacy-tldr {
+    max-width: 62ch;
+    margin: var(--sp-6) auto 0;
+    padding: var(--sp-4) var(--sp-6);
+    color: var(--text-primary);
+    background: var(--surface-strong);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-glow);
+    animation: float-in var(--dur-slow) var(--ease) both;
+    animation-delay: 360ms;
+}
+
+.privacy-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: var(--sp-6);
+}
+
+.privacy-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    padding: var(--sp-6);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    animation: float-in var(--dur-slow) var(--ease) both;
+    transition: transform var(--dur-med) var(--ease),
+                border-color var(--dur-med) var(--ease),
+                box-shadow var(--dur-med) var(--ease);
+}
+
+.privacy-card:hover,
+.privacy-card:focus-within {
+    transform: translateY(-4px);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+
+.privacy-grid > :nth-child(1) { animation-delay: 60ms; }
+.privacy-grid > :nth-child(2) { animation-delay: 130ms; }
+.privacy-grid > :nth-child(3) { animation-delay: 200ms; }
+.privacy-grid > :nth-child(4) { animation-delay: 270ms; }
+.privacy-grid > :nth-child(5) { animation-delay: 340ms; }
+.privacy-grid > :nth-child(6) { animation-delay: 410ms; }
+
+.privacy-card__icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.privacy-card__title {
+    font-size: 1.15rem;
+}
+
+.privacy-card__text {
+    flex: 1;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.privacy-card__link {
+    width: fit-content;
+    margin-top: var(--sp-2);
+    font-weight: 600;
+    color: var(--glow-cyan);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur-fast) var(--ease);
+}
+
+.privacy-card__link:hover,
+.privacy-card__link:focus-visible {
+    border-bottom-color: var(--glow-cyan);
+}
+
+.privacy-contact {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.privacy-contact__mail {
+    display: inline-block;
+    margin-inline-start: var(--sp-2);
+    font-weight: 600;
+    color: var(--glow-cyan);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur-fast) var(--ease);
+}
+
+.privacy-contact__mail:hover,
+.privacy-contact__mail:focus-visible {
+    border-bottom-color: var(--glow-cyan);
+}
