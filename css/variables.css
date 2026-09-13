@@ -32,6 +32,14 @@
     --status-finished: #57e39b;
     --status-soon: #b08cff;
 
+    /* Tool differentiator: gold instruments against the space blues */
+    --tool-accent: #ffd166;
+    --tool-accent-2: #ffb347;
+    --tool-border: rgba(255, 209, 102, 0.3);
+    --tool-border-strong: rgba(255, 209, 102, 0.6);
+    --tool-tint: rgba(255, 209, 102, 0.09);
+    --tool-glow: 0 0 30px rgba(255, 209, 102, 0.22);
+
     /* Typography */
     --font-sans: "Segoe UI", "Helvetica Neue", system-ui, -apple-system, sans-serif;
     --font-display: "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
@@ -90,6 +98,13 @@
     --status-active: #0b5e9e;
     --status-finished: #14713f;
     --status-soon: #5b36c4;
+
+    --tool-accent: #8a6400;
+    --tool-accent-2: #a1570a;
+    --tool-border: rgba(138, 100, 0, 0.35);
+    --tool-border-strong: rgba(138, 100, 0, 0.6);
+    --tool-tint: rgba(138, 100, 0, 0.1);
+    --tool-glow: 0 0 24px rgba(138, 100, 0, 0.25);
 
     --shadow-glow: 0 0 24px rgba(21, 80, 184, 0.25);
     --shadow-card: 0 12px 40px rgba(23, 64, 139, 0.18);

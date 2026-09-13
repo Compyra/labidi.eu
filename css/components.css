@@ -146,6 +146,25 @@
     color: #fff;
 }
 
+/* The Tools filter wears the gold instrument livery. */
+.filter--tools::before {
+    content: "\2699\FE0E\00A0";
+    color: var(--tool-accent);
+}
+
+.filter--tools:hover {
+    border-color: var(--tool-border-strong);
+}
+
+.filter--tools.is-active {
+    background: linear-gradient(120deg, var(--tool-accent), var(--tool-accent-2));
+    box-shadow: var(--tool-glow);
+}
+
+.filter--tools.is-active::before {
+    color: inherit;
+}
+
 /* ---------- Search + tag filter ---------- */
 .project-search {
     display: flex;
@@ -366,6 +385,80 @@
 .badge--active { color: var(--status-active); }
 .badge--finished { color: var(--status-finished); }
 .badge--soon { color: var(--status-soon); }
+
+/* ---------- Tool differentiator ---------- */
+/* Standalone tools we built get a gold instrument treatment. */
+.project-card__badges {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--sp-1);
+}
+
+.tool-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    padding: var(--sp-1) var(--sp-2);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    border-radius: 999px;
+    border: 1px solid var(--tool-border-strong);
+    color: var(--tool-accent);
+    background: var(--tool-tint);
+}
+
+.tool-flag::before {
+    content: "\2699\FE0E";
+    line-height: 1;
+    animation: tool-gear-turn 14s linear infinite;
+}
+
+:root[data-motion="off"] .tool-flag::before {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tool-flag::before {
+        animation: none;
+    }
+}
+
+@keyframes tool-gear-turn {
+    to { transform: rotate(360deg); }
+}
+
+.project-card--tool {
+    border-color: var(--tool-border);
+}
+
+/* Thin gold rail along the card top, like a marked instrument panel. */
+.project-card--tool::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--tool-accent), transparent);
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+/* Cursor glow shifts from cyan to gold on tool cards. */
+.project-card--tool::before {
+    background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 0%),
+                var(--tool-tint), transparent 45%);
+}
+
+.project-card--tool:hover,
+.project-card--tool:focus-within {
+    border-color: var(--tool-border-strong);
+    box-shadow: var(--shadow-card), var(--tool-glow);
+}
 
 /* Progress bar */
 .progress {

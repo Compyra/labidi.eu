@@ -11,6 +11,8 @@
     /* status: "active" | "finished" | "soon"
        progress: 0-100 (used for active projects)
        url: string or null (null => "coming soon", not clickable)
+       tool: true => a standalone tool we built; gets the gold tool
+                     treatment and the dedicated "Tools" filter
        egg: true => clicking never navigates (easter-egg hook) */
     const PROJECTS = [
         {
@@ -37,7 +39,50 @@
             status: "active",
             progress: 70,
             url: "https://ghosttooth.labidi.eu",
+            tool: true,
             tags: ["Security", "Privacy", "Safety", "Tools"]
+        },
+        {
+            name: "Labidi Scanner",
+            desc: {
+                en: "Portable network scanner in one exe: every device on your network with IP, MAC, vendor, hostname, role and open ports. No installer, no internet calls.",
+                fr: "Scanner réseau portable en un seul exe : chaque appareil de votre réseau avec IP, MAC, fabricant, nom d'hôte, rôle et ports ouverts. Sans installation ni appels internet.",
+                de: "Portabler Netzwerkscanner in einer Exe: jedes Gerät im Netzwerk mit IP, MAC, Hersteller, Hostname, Rolle und offenen Ports. Keine Installation, keine Internetzugriffe.",
+                ar: "ماسح شبكات محمول في ملف واحد: كل جهاز في شبكتك مع IP وMAC والمصنّع واسم المضيف والدور والمنافذ المفتوحة. بلا تثبيت وبلا اتصالات إنترنت."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://scanner.labidi.eu",
+            tool: true,
+            tags: ["Tools", "Security"]
+        },
+        {
+            name: "Labidi Disk Analyzer",
+            desc: {
+                en: "A 3.5 MB portable exe that shows where your disk space went and what changed: ranked folders, biggest files and snapshot diffs. No installer, no telemetry.",
+                fr: "Un exe portable de 3,5 Mo qui montre où est passé l'espace disque et ce qui a changé : dossiers classés, plus gros fichiers et comparaisons d'instantanés. Sans installation ni télémétrie.",
+                de: "Eine portable 3,5-MB-Exe, die zeigt, wohin der Speicherplatz verschwand und was sich änderte: sortierte Ordner, größte Dateien und Snapshot-Vergleiche. Keine Installation, keine Telemetrie.",
+                ar: "ملف محمول بحجم 3.5 م.ب يُظهر أين ذهبت مساحة القرص وما الذي تغيّر: مجلدات مرتبة وأكبر الملفات ومقارنات اللقطات. بلا تثبيت وبلا قياس عن بُعد."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://diskanalyzer.labidi.eu",
+            tool: true,
+            tags: ["Tools"]
+        },
+        {
+            name: "LabidiForensic",
+            desc: {
+                en: "One portable exe that reads what a Windows machine remembers: devices ever attached, Wi-Fi history, programs run, files opened, sign-ins. It also says what it could not read.",
+                fr: "Un exe portable qui lit ce dont une machine Windows se souvient : appareils branchés, historique Wi-Fi, programmes lancés, fichiers ouverts, connexions. Il indique aussi ce qu'il n'a pas pu lire.",
+                de: "Eine portable Exe, die liest, woran sich ein Windows-Rechner erinnert: angeschlossene Geräte, WLAN-Verlauf, gestartete Programme, geöffnete Dateien, Anmeldungen. Sie nennt auch, was sie nicht lesen konnte.",
+                ar: "ملف محمول يقرأ ما يتذكره جهاز ويندوز: الأجهزة التي وُصلت يوماً، وسجل Wi-Fi، والبرامج المشغّلة، والملفات المفتوحة، وتسجيلات الدخول. ويذكر أيضاً ما تعذّرت قراءته."
+            },
+            status: "finished",
+            progress: 100,
+            url: "https://forensic.labidi.eu",
+            tool: true,
+            tags: ["Tools", "Security", "Privacy"]
         },
         {
             name: "O.A.S.I.S.",
@@ -172,10 +217,10 @@
         {
             name: "Alphabet Studio",
             desc: {
-                en: "Phonetic alphabet studio covering military, world and fantasy spelling codes.",
-                fr: "Studio d'alphabets phonétiques : codes d'épellation militaires, du monde et fantastiques.",
-                de: "Studio für phonetische Alphabete: militärische, internationale und Fantasy-Buchstabiercodes.",
-                ar: "استوديو الأبجديات الصوتية: رموز تهجئة عسكرية وعالمية وخيالية."
+                en: "Phonetic alphabet studio covering military, world and fantasy spelling codes. Note: the built-in wake-lock timer can keep your computer unlocked if you leave the page open.",
+                fr: "Studio d'alphabets phonétiques : codes d'épellation militaires, du monde et fantastiques. Attention : le minuteur anti-veille intégré peut garder votre ordinateur déverrouillé si la page reste ouverte.",
+                de: "Studio für phonetische Alphabete: militärische, internationale und Fantasy-Buchstabiercodes. Hinweis: Der eingebaute Wake-Lock-Timer kann den Computer entsperrt halten, solange die Seite geöffnet bleibt.",
+                ar: "استوديو الأبجديات الصوتية: رموز تهجئة عسكرية وعالمية وخيالية. تنبيه: مؤقّت منع السكون المدمج قد يُبقي حاسوبك غير مقفل إذا تركت الصفحة مفتوحة."
             },
             status: "finished",
             progress: 100,
@@ -285,7 +330,19 @@
         badge.className = "badge badge--" + p.status;
         badge.textContent = statusLabel(p.status);
 
-        head.append(titles, badge);
+        // Right-hand chip stack: the gold tool flag sits above the status.
+        const badges = document.createElement("div");
+        badges.className = "project-card__badges";
+        if (p.tool) {
+            li.classList.add("project-card--tool");
+            const flag = document.createElement("span");
+            flag.className = "tool-flag";
+            flag.textContent = window.I18N ? window.I18N.t("card.tool") : "Tool";
+            badges.append(flag);
+        }
+        badges.append(badge);
+
+        head.append(titles, badges);
 
         const desc = document.createElement("p");
         desc.className = "project-card__desc";
@@ -380,7 +437,11 @@
     }
 
     function matches(p, filter, query, tags) {
-        if (filter !== "all" && p.status !== filter) return false;
+        if (filter === "tools") {
+            if (!p.tool) return false;
+        } else if (filter !== "all" && p.status !== filter) {
+            return false;
+        }
         if (tags.length && !tags.every(function (t) {
             return (p.tags || []).indexOf(t) !== -1;
         })) return false;
